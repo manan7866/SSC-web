@@ -6,7 +6,7 @@ export const config = {
   // "http://localhost:6015/v1",
 
   // Google OAuth Client ID
-  GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
 
   // Environment
   NODE_ENV: process.env.NODE_ENV || "development",
@@ -16,10 +16,8 @@ export const config = {
 
   //stripe
   STRIPE_PUBLIC_KEY:
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
     process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
   STRIPE_SECRET_KEY:
-    process.env.STRIPE_SECRET_KEY ||
     process.env.STRIPE_SECRET_KEY,
 };
 
