@@ -1,14 +1,14 @@
-import { Saira, Nunito_Sans } from "next/font/google";
+import { Inter } from "next/font/google";
 
-// Using Google fonts with preconnect in head to avoid build-time fetch issues
-export const nunitoSans = Nunito_Sans({
-  weight: ["400", "500", "600", "700", "800", "900"],
+// Using a more compatible Google font to avoid build-time fetch issues
+export const nunitoSans = Inter({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--fixnix-font",
   display: "swap",
 });
 
-export const saira = Saira({
+export const saira = Inter({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--fixnix-font-two",
