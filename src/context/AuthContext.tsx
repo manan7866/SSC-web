@@ -20,6 +20,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+export { AuthContext };
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [membership, setMembership] = useState<MembershipPayload | null>(null);

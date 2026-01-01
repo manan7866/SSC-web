@@ -1,12 +1,29 @@
 "use client";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 import Layout from "../../components/layout/Layout";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
 import { updateUserProfile } from "@/hooks/profileServices";
 
 export default function Profile() {
-  const { user, fetchUserProfile, loading } = useAuth();
+  const [authData, setAuthData] = useState<{ user: any; fetchUserProfile: (() => Promise<void>) | null; loading: boolean }>({ user: null, fetchUserProfile: null, loading: true });
+
+  useEffect(() => {
+    const authContext = useContext(AuthContext);
+    if (authContext) {
+      setAuthData({
+        user: authContext.user || null,
+        fetchUserProfile: authContext.fetchUserProfile || null,
+        loading: authContext.loading || false
+      });
+    } else {
+      // If there's no AuthProvider context (during build time), set default values
+      setAuthData({ user: null, fetchUserProfile: null, loading: false });
+    }
+  }, []);
+
+  const { user, loading } = authData;
+  const fetchUserProfile = authData.fetchUserProfile;
   const [isEditing, setIsEditing] = useState(false);
   const [updating, setUpdating] = useState(false);
   
@@ -24,7 +41,9 @@ export default function Profile() {
     try {
       setUpdating(true);
       await updateUserProfile(data);
-      await fetchUserProfile(); // Refresh global state
+      if (fetchUserProfile) {
+        await fetchUserProfile(); // Refresh global state
+      }
       setIsEditing(false);
       alert("Profile updated successfully!");
     } catch (err) {

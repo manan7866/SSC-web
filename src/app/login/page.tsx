@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
-import { useAuth } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
 import { resendOTP } from "@/hooks/authServices";
 import { Card, CardContent } from "@/components/ui/s-card";
 import { cn } from "@/lib/utils";
@@ -17,11 +17,28 @@ import { toast } from "sonner";
 import { config } from "@/lib/config";
 
 export default function Login() {
+  const [authData, setAuthData] = useState<{ login: ((email: string, password: string) => Promise<void>) | null; googleLogin: ((email: string, fullName: string) => Promise<void>) | null; authLoading: boolean }>({ login: null, googleLogin: null, authLoading: false });
   const methods = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     mode: "all",
   });
-  const { login, googleLogin, loading: authLoading } = useAuth();
+
+  useEffect(() => {
+    const authContext = useContext(AuthContext);
+    if (authContext) {
+      setAuthData({
+        login: authContext.login || null,
+        googleLogin: authContext.googleLogin || null,
+        authLoading: authContext.loading || false
+      });
+    } else {
+      // If there's no AuthProvider context (during build time), set default values
+      setAuthData({ login: null, googleLogin: null, authLoading: false });
+    }
+  }, []);
+
+  const { login, googleLogin } = authData;
+  const authLoading = authData.authLoading;
   const [googleLoginLoading, setGoogleLoginLoading] = useState(false);
   const [error, setError] = useState<string | React.ReactElement | null>(null);
   const [googleError, setGoogleError] = useState<string | null>(null);
@@ -34,6 +51,12 @@ export default function Login() {
     setError(null);
     setGoogleError(null);
     setSuccessMessage(null);
+
+    if (!login) {
+      setError("Authentication system is not available");
+      setLoading(false);
+      return;
+    }
 
     try {
       setLoading(true);
@@ -112,6 +135,12 @@ export default function Login() {
   }, []);
 
   const handleGoogleResponse = async (response: any) => {
+    if (!googleLogin) {
+      setGoogleError("Authentication system is not available");
+      setGoogleLoginLoading(false);
+      return;
+    }
+
     try {
       setGoogleLoginLoading(true);
       setGoogleError(null);

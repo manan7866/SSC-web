@@ -1,6 +1,6 @@
 "use client";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useContext, useState } from "react";
 import {
   createMembership,
   updateMembership,
@@ -11,7 +11,7 @@ import {
   VOLUNTEER_MODE_TYPES,
   COLLABORATOR_INTENT_TYPES,
 } from "@/hooks/membershipServices";
-import { useAuth } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
 
 interface MembershipFormData {
   phone: string;
@@ -33,7 +33,23 @@ interface MembershipFormData {
 }
 
 export default function MembershipForm() {
-  const { membership, setMembership } = useAuth();
+  const [authData, setAuthData] = useState<{ membership: any; setMembership: ((membership: any) => void) | null }>({ membership: null, setMembership: null });
+
+  useEffect(() => {
+    const authContext = useContext(AuthContext);
+    if (authContext) {
+      setAuthData({
+        membership: authContext.membership || null,
+        setMembership: authContext.setMembership || null
+      });
+    } else {
+      // If there's no AuthProvider context (during build time), set default values
+      setAuthData({ membership: null, setMembership: null });
+    }
+  }, []);
+
+  const { membership } = authData;
+  const setMembership = authData.setMembership;
 
   const {
     register,
@@ -57,9 +73,9 @@ export default function MembershipForm() {
   // ✅ Prefill form if membership exists
   useEffect(() => {
     if (membership) {
-      setValue("phone", membership.phone);
-      setValue("location", membership.country);
-      setValue("roles", membership.role[0]); // ✅ Take first role as string
+      setValue("phone", membership.phone || "");
+      setValue("location", membership.country || "");
+      setValue("roles", membership.role && membership.role.length > 0 ? membership.role[0] : "");
       setValue("volunteerAreas", membership.volunteerSupport || []);
       setValue("volunteerExperience", membership.previousVolunteerExp || "");
       setValue("volunteerTime", membership.monthlyTime || "");
@@ -91,15 +107,17 @@ export default function MembershipForm() {
         intentCreation: data.collabVision || "",
         collaboratorIntent: (data.collabType || []) as typeof COLLABORATOR_INTENT_TYPES[number][],
       };
-  
+
       let response;
       if (membership) {
         response = await updateMembership(payload);
       } else {
         response = await createMembership(payload);
       }
-  
-      setMembership(response.data);
+
+      if (setMembership) {
+        setMembership(response.data);
+      }
       alert("Membership saved successfully!");
     } catch (err) {
       console.error(err);
@@ -110,7 +128,9 @@ export default function MembershipForm() {
     if (confirm("Are you sure you want to delete your membership?")) {
       try {
         await deleteMembership();
-        setMembership(null);
+        if (setMembership) {
+          setMembership(null);
+        }
         alert("Membership deleted successfully!");
       } catch (err) {
         console.error(err);
