@@ -1,9 +1,9 @@
 "use client";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { FormProvider, useForm } from "react-hook-form";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { resendOTP } from "@/hooks/authServices";
 import { Card, CardContent } from "@/components/ui/s-card";
 import { cn } from "@/lib/utils";
@@ -17,25 +17,26 @@ import { toast } from "sonner";
 import { config } from "@/lib/config";
 
 export default function Login() {
-  const [authData, setAuthData] = useState<{ login: ((email: string, password: string) => Promise<void>) | null; googleLogin: ((email: string, fullName: string) => Promise<void>) | null; authLoading: boolean }>({ login: null, googleLogin: null, authLoading: false });
+  const authContext = useAuth(); // Move hook call to top level
   const methods = useForm<LoginFormInputs>({
     resolver: zodResolver(loginSchema),
     mode: "all",
   });
 
+  const [authData, setAuthData] = useState<{ login: ((email: string, password: string) => Promise<void>) | null; googleLogin: ((email: string, fullName: string) => Promise<void>) | null; authLoading: boolean }>({
+    login: authContext.login || null,
+    googleLogin: authContext.googleLogin || null,
+    authLoading: authContext.loading || false
+  });
+
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        login: authContext.login || null,
-        googleLogin: authContext.googleLogin || null,
-        authLoading: authContext.loading || false
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ login: null, googleLogin: null, authLoading: false });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      login: authContext.login || null,
+      googleLogin: authContext.googleLogin || null,
+      authLoading: authContext.loading || false
+    });
+  }, [authContext.login, authContext.googleLogin, authContext.loading]);
 
   const { login, googleLogin } = authData;
   const authLoading = authData.authLoading;

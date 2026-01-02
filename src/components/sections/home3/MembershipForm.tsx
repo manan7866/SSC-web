@@ -1,6 +1,6 @@
 "use client";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { useEffect, useContext, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createMembership,
   updateMembership,
@@ -11,7 +11,7 @@ import {
   VOLUNTEER_MODE_TYPES,
   COLLABORATOR_INTENT_TYPES,
 } from "@/hooks/membershipServices";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface MembershipFormData {
   phone: string;
@@ -33,20 +33,20 @@ interface MembershipFormData {
 }
 
 export default function MembershipForm() {
-  const [authData, setAuthData] = useState<{ membership: any; setMembership: ((membership: any) => void) | null }>({ membership: null, setMembership: null });
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ membership: any; setMembership: ((membership: any) => void) | null }>({
+    membership: authContext.membership || null,
+    setMembership: authContext.setMembership || null
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        membership: authContext.membership || null,
-        setMembership: authContext.setMembership || null
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ membership: null, setMembership: null });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      membership: authContext.membership || null,
+      setMembership: authContext.setMembership || null
+    });
+  }, [authContext.membership, authContext.setMembership]);
 
   const { membership } = authData;
   const setMembership = authData.setMembership;

@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useNavigation } from "@/hooks/useNavigation";
 
 interface MobileMenuProps {
@@ -22,22 +22,22 @@ const MobileMenu = ({
     key: "",
     subMenuKey: "",
   });
-  const [authData, setAuthData] = useState<{ isAuthenticated: boolean; logout: (() => void) | null }>({ isAuthenticated: false, logout: null });
   const router = useRouter();
   const { explorerRoutes, academyRoutes, loading } = useNavigation();
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ isAuthenticated: boolean; logout: (() => void) | null }>({
+    isAuthenticated: authContext.isAuthenticated || false,
+    logout: authContext.logout || null
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        isAuthenticated: authContext.isAuthenticated || false,
-        logout: authContext.logout || null
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ isAuthenticated: false, logout: null });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      isAuthenticated: authContext.isAuthenticated || false,
+      logout: authContext.logout || null
+    });
+  }, [authContext.isAuthenticated, authContext.logout]);
 
   const { isAuthenticated } = authData;
   const logout = authData.logout;

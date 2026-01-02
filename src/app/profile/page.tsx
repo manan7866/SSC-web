@@ -1,26 +1,27 @@
 "use client";
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Layout from "../../components/layout/Layout";
 import { useForm } from "react-hook-form";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { updateUserProfile } from "@/hooks/profileServices";
 
 export default function Profile() {
-  const [authData, setAuthData] = useState<{ user: any; fetchUserProfile: (() => Promise<void>) | null; loading: boolean }>({ user: null, fetchUserProfile: null, loading: true });
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ user: any; fetchUserProfile: (() => Promise<void>) | null; loading: boolean }>({
+    user: authContext.user || null,
+    fetchUserProfile: authContext.fetchUserProfile || null,
+    loading: authContext.loading || false
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        user: authContext.user || null,
-        fetchUserProfile: authContext.fetchUserProfile || null,
-        loading: authContext.loading || false
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ user: null, fetchUserProfile: null, loading: false });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      user: authContext.user || null,
+      fetchUserProfile: authContext.fetchUserProfile || null,
+      loading: authContext.loading || false
+    });
+  }, [authContext.user, authContext.fetchUserProfile, authContext.loading]);
 
   const { user, loading } = authData;
   const fetchUserProfile = authData.fetchUserProfile;

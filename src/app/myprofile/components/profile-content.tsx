@@ -18,12 +18,12 @@ import { FormInput } from "@/components/form-input";
 import { Button } from "@/components/ui/button";
 import ProductsTab from "./Myproducts";
 import { LoaderCircle, Phone } from "lucide-react";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import apiClient from "@/lib/apiClient";
 import { toast } from "sonner";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import PaymentMethodList from "@/components/stripe-payment/PaymentMethodsList";
 
 const profileSchema = z.object({
@@ -35,21 +35,22 @@ const profileSchema = z.object({
 type ProfileEditFields = z.infer<typeof profileSchema>;
 export default function ProfileContent() {
   const [updateLoading, setUpdateLoading] = useState(false);
-  const [authData, setAuthData] = useState<{ user: any; loading: boolean; fetchUserProfile: (() => Promise<void>) | null }>({ user: null, loading: true, fetchUserProfile: null });
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ user: any; loading: boolean; fetchUserProfile: (() => Promise<void>) | null }>({
+    user: authContext.user || null,
+    loading: authContext.loading || false,
+    fetchUserProfile: authContext.fetchUserProfile || null
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        user: authContext.user || null,
-        loading: authContext.loading || false,
-        fetchUserProfile: authContext.fetchUserProfile || null
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ user: null, loading: false, fetchUserProfile: null });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      user: authContext.user || null,
+      loading: authContext.loading || false,
+      fetchUserProfile: authContext.fetchUserProfile || null
+    });
+  }, [authContext.user, authContext.loading, authContext.fetchUserProfile]);
 
   const { user, loading } = authData;
   const fetchUserProfile = authData.fetchUserProfile;

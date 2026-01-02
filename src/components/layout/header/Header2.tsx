@@ -1,12 +1,12 @@
 "use client";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import StickyHeader from "../StickyHeader";
 import Menu from "../Menu";
 import MobileMenu from "../MobileMenu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 
 interface Header2Props {
   scroll: number;
@@ -27,22 +27,23 @@ const Header2: React.FC<Header2Props> = ({
 }: Header2Props) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [isSticky, setIsSticky] = useState(false);
-  const [authData, setAuthData] = useState<{ isAuthenticated: boolean; user: any; logout: any }>({ isAuthenticated: false, user: null, logout: null });
   const router = useRouter();
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ isAuthenticated: boolean; user: any; logout: any }>({
+    isAuthenticated: authContext.isAuthenticated || false,
+    user: authContext.user || null,
+    logout: authContext.logout || null
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        isAuthenticated: authContext.isAuthenticated || false,
-        user: authContext.user || null,
-        logout: authContext.logout || null
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ isAuthenticated: false, user: null, logout: null });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      isAuthenticated: authContext.isAuthenticated || false,
+      user: authContext.user || null,
+      logout: authContext.logout || null
+    });
+  }, [authContext.isAuthenticated, authContext.user, authContext.logout]);
 
   const { isAuthenticated, user } = authData;
   const logout = authData.logout;

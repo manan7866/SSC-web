@@ -3,25 +3,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Camera, Calendar, Mail } from "lucide-react";
-import { AuthContext } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ProfileHeader() {
-  const [authData, setAuthData] = useState<{ user: any; loading: boolean }>({ user: null, loading: true });
+  const authContext = useAuth(); // Move hook call to top level
+
+  const [authData, setAuthData] = useState<{ user: any; loading: boolean }>({
+    user: authContext.user || null,
+    loading: authContext.loading || false
+  });
 
   useEffect(() => {
-    const authContext = useContext(AuthContext);
-    if (authContext) {
-      setAuthData({
-        user: authContext.user || null,
-        loading: authContext.loading || false
-      });
-    } else {
-      // If there's no AuthProvider context (during build time), set default values
-      setAuthData({ user: null, loading: false });
-    }
-  }, []);
+    // Update auth data when authContext changes
+    setAuthData({
+      user: authContext.user || null,
+      loading: authContext.loading || false
+    });
+  }, [authContext.user, authContext.loading]);
 
   const { user, loading } = authData;
 
