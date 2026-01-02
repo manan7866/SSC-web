@@ -1,10 +1,6 @@
 "use client"; // Ensure this component is rendered on the client-side
 
-import { useState } from "react";
-import dynamic from "next/dynamic";
-
-// Dynamically import ModalVideo to ensure it's only loaded on the client side
-const ModalVideo = dynamic(() => import("react-modal-video"), { ssr: false });
+import { useState, useEffect } from "react";
 
 // Define types for the props
 interface VideoPopupProps {
@@ -15,13 +11,27 @@ interface VideoPopupProps {
 export default function VideoPopup({ style, text }: VideoPopupProps) {
   const [isOpen, setOpen] = useState(false);
 
+  // Disable body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Video button styles based on 'style' prop */}
       {!style && (
         <a
           onClick={() => setOpen(true)}
-          className="overlay-link lightbox-image video-fancybox ripple"
+          className="overlay-link lightbox-image video-fancybox ripple cursor-pointer"
         >
           <span className="play-icon flaticon-play" />
         </a>
@@ -31,7 +41,7 @@ export default function VideoPopup({ style, text }: VideoPopupProps) {
         <div className="video-btn">
           <a
             onClick={() => setOpen(true)}
-            className="overlay-link lightbox-image video-fancybox ripple"
+            className="overlay-link lightbox-image video-fancybox ripple cursor-pointer"
           >
             <span className="play-icon flaticon-play" />
           </a>
@@ -42,7 +52,7 @@ export default function VideoPopup({ style, text }: VideoPopupProps) {
         <div className="video-btn">
           <a
             onClick={() => setOpen(true)}
-            className="overlay-link lightbox-image video-fancybox ripple"
+            className="overlay-link lightbox-image video-fancybox ripple cursor-pointer"
           >
             <span className="play-icon flaticon-play" />
           </a>
@@ -52,7 +62,7 @@ export default function VideoPopup({ style, text }: VideoPopupProps) {
 
       {style === 3 && (
         <div className="video-btn">
-          <a onClick={() => setOpen(true)} className="lightbox-image">
+          <a onClick={() => setOpen(true)} className="lightbox-image cursor-pointer">
             <i className="customicon-play-button" />
             <span className="border-animation border-1" />
             <span className="border-animation border-2" />
@@ -63,7 +73,7 @@ export default function VideoPopup({ style, text }: VideoPopupProps) {
 
       {style === 4 && (
         <div className="video-btn">
-          <a onClick={() => setOpen(true)} className="lightbox-image">
+          <a onClick={() => setOpen(true)} className="lightbox-image cursor-pointer">
             <img src="/assets/images-4/icons/video-btn-1.png" alt="Play" />
           </a>
         </div>
@@ -72,42 +82,39 @@ export default function VideoPopup({ style, text }: VideoPopupProps) {
       {style === 5 && (
         <a
           onClick={() => setOpen(true)}
-          className="video-btn overlay-link lightbox-image video-fancybox ripple"
+          className="video-btn overlay-link lightbox-image video-fancybox ripple cursor-pointer"
         >
           <span className="fas fa-play" />
         </a>
       )}
 
-      {/* Modal for displaying YouTube video */}
-      <ModalVideo
-        channel="youtube"
-        isOpen={isOpen}
-        videoId="vfhzo499OeA"
-        onClose={() => setOpen(false)}
-        allowFullScreen={true} // Add missing props
-        ratio="16:9" // Add ratio for video
-        animationSpeed={1} // Add animation speed
-        classNames={{
-          modalVideoEffect: "modal-video-effect",
-          modalVideo: "modal-video",
-          modalVideoClose: "modal-video-close",
-          modalVideoBody: "modal-video-body",
-          modalVideoInner: "modal-video-inner",
-          modalVideoIframeWrap: "modal-video-movie-wrap",
-          modalVideoCloseBtn: "modal-video-close-btn",
-        }} // Set classNames as a valid string
-        aria={{
-          openMessage: "Video player opened", // Set openMessage for accessibility
-          dismissBtnMessage: "Close video player", // Set dismissBtnMessage for accessibility
-        }}
-        youtube={{
-          autoplay: 1, // Enable autoplay
-          loop: 1, // Enable loop
-          controls: 1, // Show controls
-          modestbranding: 1, // Minimal branding
-          rel: 0, // Disable related videos
-        }}
-      />
+      {/* Custom YouTube Modal */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-[9999] bg-black bg-opacity-80 flex items-center justify-center p-4"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="relative w-full max-w-4xl aspect-video bg-black"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-4 right-4 text-white text-2xl z-10 hover:text-gray-300"
+              onClick={() => setOpen(false)}
+              aria-label="Close video"
+            >
+              <i className="fas fa-times"></i>
+            </button>
+            <iframe
+              src={`https://www.youtube.com/embed/vfhzo499OeA?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0`}
+              title="YouTube video player"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            ></iframe>
+          </div>
+        </div>
+      )}
     </>
   );
 }

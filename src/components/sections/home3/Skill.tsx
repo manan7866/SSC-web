@@ -1,10 +1,8 @@
 "use client";
 import CounterUp from "../../../components/elements/CounterUp";
-import ModalVideo from "react-modal-video";
-import { useState } from "react";
+import VideoPopup from "@/components/elements/VideoPopup";
 
 export default function Skill() {
-  const [isOpen, setOpen] = useState(false);
   return (
     <>
       {/* Two Section Start */}
@@ -82,16 +80,7 @@ export default function Skill() {
                         alt="Professional gadget and smartphone repair"
                       />
                       <div className="skill-one__video-link">
-                        <button
-                          onClick={() => setOpen(true)}
-                          className="video-popup"
-                          aria-label="Play video about our services"
-                        >
-                          <div className="skill-one__video-icon">
-                            <span className="fa fa-play"></span>
-                            <i className="ripple"></i>
-                          </div>
-                        </button>
+                        <VideoPopup style={0} />
                       </div>
                     </div>
                     <div className="skill-one__video-content">
@@ -130,14 +119,6 @@ export default function Skill() {
           </div>
         </div>
       </section>
-
-      {/* Modal Video */}
-      <ModalVideo
-        channel="youtube"
-        isOpen={isOpen}
-        videoId="Get7rqXYrbQ"
-        onClose={() => setOpen(false)}
-      />
     </>
   );
 }

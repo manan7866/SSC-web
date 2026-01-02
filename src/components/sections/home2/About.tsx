@@ -1,9 +1,8 @@
 "use client";
-import ModalVideo from "react-modal-video";
-import { useState } from "react";
 import Link from "next/link";
+import VideoPopup from "@/components/elements/VideoPopup";
+
 export default function About() {
-  const [isOpen, setOpen] = useState(false);
   return (
     <>
       {/*About Two Start*/}
@@ -51,12 +50,7 @@ export default function About() {
                   <div className="about-two__img-two">
                     <img src="assets/images/resources/about-2-2.jpg" alt="image" />
                     <div className="about-two__video-link">
-                      <a onClick={() => setOpen(true)} className="video-popup">
-                        <div className="about-two__video-icon">
-                          <span className="fa fa-play"></span>
-                          <i className="ripple"></i>
-                        </div>
-                      </a>
+                      <VideoPopup style={0} />
                     </div>
                   </div>
                 </div>
@@ -127,12 +121,6 @@ export default function About() {
         </div>
       </section>
       {/*About Two  End*/}
-      <ModalVideo
-        channel="youtube"
-        isOpen={isOpen}
-        videoId="Get7rqXYrbQ"
-        onClose={() => setOpen(false)}
-      />
     </>
   );
 }

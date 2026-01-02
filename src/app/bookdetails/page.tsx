@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
-import Breadcrumb from "@/components/sections/home3/Breadcrumb";
+
 import Image from "next/image";
 import Link from "next/link";
-import { FaDownload, FaLock, FaInfoCircle, FaBook, FaHeart, FaRegHeart, FaShareAlt, FaFacebook, FaWhatsapp, FaPinterest, FaClock, FaCheckCircle } from "react-icons/fa";
-import { toast } from "react-hot-toast";
+import { FaDownload, FaLock, FaInfoCircle, FaBook, FaFacebook, FaWhatsapp, FaPinterest, FaClock, FaCheckCircle } from "react-icons/fa";
 
 interface BookDetails {
   id: string;

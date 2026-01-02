@@ -1,13 +1,8 @@
 "use client";
-import ModalVideo from "react-modal-video";
 import { useState } from "react";
+import VideoPopup from "@/components/elements/VideoPopup";
 
 export default function Skill() {
-  const [isOpen, setOpen] = useState(false);
-  function handleClose(): void {
-    throw new Error("Function not implemented.");
-  }
-
   return (
     <>
       {/*Skill One Start*/}
@@ -91,12 +86,7 @@ export default function Skill() {
                   <div className="skill-one__right-img">
                     <img src="assets/images/resources/skill-1-1.jpg" alt="image" />
                     <div className="skill-one__video-link">
-                      <a onClick={() => setOpen(true)} className="video-popup">
-                        <div className="skill-one__video-icon">
-                          <span className="fa fa-play"></span>
-                          <i className="ripple"></i>
-                        </div>
-                      </a>
+                      <VideoPopup style={0} />
                     </div>
                   </div>
                   <div className="skill-one__video-content">
@@ -109,12 +99,6 @@ export default function Skill() {
         </div>
       </section>
       {/*Skill One End*/}
-      <ModalVideo
-        channel="youtube"
-        isOpen={isOpen}
-        onClose={handleClose}
-        videoId="dQw4w9WgXcQ" // Add the video ID here
-      />
     </>
   );
 }

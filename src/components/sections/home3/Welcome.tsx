@@ -1,11 +1,8 @@
 "use client";
-import ModalVideo from "react-modal-video";
-import { useState } from "react";
 import Link from "next/link";
 import Image from 'next/image';
 
 export default function Welcome() {
-  const [isOpen, setOpen] = useState(false);
   
   return (
     <>

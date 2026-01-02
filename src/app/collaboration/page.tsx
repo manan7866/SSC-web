@@ -8,7 +8,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Swiper, SwiperSlide } from "swiper/react";
-import ModalVideo from "react-modal-video";
+
 import Link from "next/link";
 import Skill from "@/components/sections/home2/Skill";
 import Banner from "@/components/sections/home3/Banner";

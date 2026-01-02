@@ -1,5 +1,4 @@
 "use client";
-import ModalVideo from "react-modal-video";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,7 +7,6 @@ import Banner from "@/components/sections/home3/Banner";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 const WaysSlides = [
   {
@@ -49,7 +47,6 @@ const WaysSlides = [
 ];
 
 export default function Home() {
-  const [isOpen, setOpen] = useState(false);
   return (
     <Layout headerStyle={2} footerStyle={1}>
       <Banner slides={WaysSlides} />

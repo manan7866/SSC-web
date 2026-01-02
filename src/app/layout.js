@@ -1,4 +1,3 @@
-import "react-modal-video/css/modal-video.css";
 import "../styles/fixnix.css";
 import "swiper/css";
 import "swiper/css/pagination";

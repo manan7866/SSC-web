@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import ModalVideo from "react-modal-video";
+
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";

@@ -4,7 +4,7 @@ import Layout from "../../components/layout/Layout";
 import Image from "next/image";
 import Link from "next/link";
 import { FaPlay, FaPause, FaDownload, FaLock, FaInfoCircle, FaHeadphones, FaHeart, FaRegHeart, FaShareAlt, FaFacebook, FaWhatsapp, FaPinterest, FaClock, FaCheckCircle } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+
 
 // Types
 interface AudioTrack {
