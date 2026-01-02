@@ -1,4 +1,3 @@
-import apiClient from "../lib/apiClient";
 import { contentServices } from "./contentServices";
 
 export interface NavigationItem {
@@ -17,10 +16,21 @@ export const navigationServices = {
   // Fetch explorer routes from backend
   async getExplorerRoutes(): Promise<NavigationItem[]> {
     try {
-      console.log("Fetching explorer routes from:", `${apiClient.defaults.baseURL}/content/explorer`);
-      const data = await contentServices.getContentList("explorer");
-      console.log("Explorer response:", data);
-      return data?.items || [];
+      // Use the internal API route to avoid CORS issues
+      const response = await fetch('/api/navigation/explorer/routes', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Explorer response:", result);
+      return result.data?.items || [];
     } catch (error) {
       console.error("Error fetching explorer routes:", error);
       // Fallback to default routes if API fails
@@ -45,10 +55,21 @@ export const navigationServices = {
   // Fetch academy routes from backend
   async getAcademyRoutes(): Promise<NavigationItem[]> {
     try {
-      console.log("Fetching academy routes from:", `${apiClient.defaults.baseURL}/content/academy`);
-      const data = await contentServices.getContentList("academy");
-      console.log("Academy response:", data);
-      return data?.items || [];
+      // Use the internal API route to avoid CORS issues
+      const response = await fetch('/api/navigation/academy/routes', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log("Academy response:", result);
+      return result.data?.items || [];
     } catch (error) {
       console.error("Error fetching academy routes:", error);
       // Fallback to default routes if API fails

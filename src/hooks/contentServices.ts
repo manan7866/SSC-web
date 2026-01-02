@@ -1,4 +1,3 @@
-import apiClient from "../lib/apiClient";
 
 export interface ContentItem {
   id: string;
@@ -31,19 +30,23 @@ export const contentServices = {
   // Get latest version of content (backend automatically returns latest)
   async getContent(section: string, slug: string): Promise<ContentItem> {
     try {
-      const response = await apiClient.get<ContentResponse>(
-        `/content/${section}/${slug}`,
-        {
-          params: {
-            _t: Date.now(), // Cache busting parameter
-          },
-        }
-      );
-      return response.data.data;
+      const response = await fetch(`/api/navigation/content?section=${section}&slug=${slug}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.data;
     } catch (error: any) {
       console.error("Error fetching content:", error);
       throw new Error(
-        error.response?.data?.message || "Failed to fetch content"
+        error.message || "Failed to fetch content"
       );
     }
   },
@@ -51,16 +54,23 @@ export const contentServices = {
   // Get content list for a section
   async getContentList(section: string): Promise<any> {
     try {
-      const response = await apiClient.get(`/content/${section}`, {
-        params: {
-          _t: Date.now(), // Cache busting parameter
+      const response = await fetch(`/api/navigation/content?section=${section}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
         },
       });
-      return response.data.data;
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      return result.data;
     } catch (error: any) {
       console.error("Error fetching content list:", error);
       throw new Error(
-        error.response?.data?.message || "Failed to fetch content list"
+        error.message || "Failed to fetch content list"
       );
     }
   },
