@@ -12,17 +12,33 @@ export const useNavigation = () => {
       try {
         setLoading(true);
         setError(null);
-        
-        const [explorer, academy] = await Promise.all([
+
+        const [explorerResult, academyResult] = await Promise.allSettled([
           navigationServices.getExplorerRoutes(),
           navigationServices.getAcademyRoutes()
         ]);
-        
-        setExplorerRoutes(explorer);
-        setAcademyRoutes(academy);
+
+        // Handle explorer routes result
+        if (explorerResult.status === 'fulfilled') {
+          setExplorerRoutes(explorerResult.value || []);
+        } else {
+          console.error("Explorer routes fetch failed:", explorerResult.reason);
+          setExplorerRoutes([]); // Ensure we set an empty array instead of undefined
+        }
+
+        // Handle academy routes result
+        if (academyResult.status === 'fulfilled') {
+          setAcademyRoutes(academyResult.value || []);
+        } else {
+          console.error("Academy routes fetch failed:", academyResult.reason);
+          setAcademyRoutes([]); // Ensure we set an empty array instead of undefined
+        }
       } catch (err) {
         setError("Failed to fetch navigation data");
         console.error("Navigation fetch error:", err);
+        // Ensure we set empty arrays to prevent undefined values
+        setExplorerRoutes([]);
+        setAcademyRoutes([]);
       } finally {
         setLoading(false);
       }
@@ -32,8 +48,8 @@ export const useNavigation = () => {
   }, []);
 
   return {
-    explorerRoutes,
-    academyRoutes,
+    explorerRoutes: explorerRoutes || [],
+    academyRoutes: academyRoutes || [],
     loading,
     error
   };

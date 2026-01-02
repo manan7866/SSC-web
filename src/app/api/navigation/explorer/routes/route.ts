@@ -5,7 +5,9 @@ import { config } from '@/lib/config';
 export async function GET(request: NextRequest) {
   try {
     // Get the API URL for explorer routes
-    const apiUrl = `${config.API_BASE_URL}/content/explorer?_t=${Date.now()}`;
+    const apiUrl = `${config.API_BASE_URL}/content/explorer`;
+
+    console.log('Attempting to fetch explorer routes from:', apiUrl);
 
     // Make server-side request to external API
     const response = await axios.get(apiUrl, {
@@ -15,7 +17,11 @@ export async function GET(request: NextRequest) {
         'Pragma': 'no-cache',
         'Expires': '0',
       },
+      // Add timeout to prevent hanging requests
+      timeout: 10000,
     });
+
+    console.log('Explorer routes fetch successful:', response.status);
 
     // Return the data from the external API
     return new Response(JSON.stringify(response.data), {
@@ -27,6 +33,41 @@ export async function GET(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Error fetching explorer routes:', error);
+
+    // Log the specific error for debugging
+    console.error('Explorer routes error details:', {
+      message: error.message,
+      code: error.code,
+      status: error.response?.status,
+      data: error.response?.data
+    });
+
+    // If there's a network error, try to make the request without some headers that might cause issues
+    if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      try {
+        console.log('Retrying explorer routes fetch with minimal headers...');
+
+        const apiUrl = `${config.API_BASE_URL}/content/explorer`;
+        const response = await axios.get(apiUrl, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          timeout: 15000, // Slightly longer timeout for retry
+        });
+
+        console.log('Explorer routes fetch successful on retry:', response.status);
+
+        return new Response(JSON.stringify(response.data), {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+          },
+        });
+      } catch (retryError) {
+        console.error('Retry also failed for explorer routes:', retryError);
+      }
+    }
 
     // Return fallback data in case of error
     const fallbackData = {
