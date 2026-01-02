@@ -18,7 +18,20 @@ interface AuthContextType {
   setMembership: (membership: MembershipPayload | null) => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Create a default context value with empty functions to prevent React error #321
+const defaultAuthContext: AuthContextType = {
+  user: null,
+  membership: null,
+  isAuthenticated: false,
+  loading: true,
+  login: async () => { throw new Error('AuthProvider not found'); },
+  googleLogin: async () => { throw new Error('AuthProvider not found'); },
+  logout: () => { throw new Error('AuthProvider not found'); },
+  fetchUserProfile: async () => { throw new Error('AuthProvider not found'); },
+  setMembership: () => { throw new Error('AuthProvider not found'); },
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 export { AuthContext };
 
@@ -227,6 +240,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used inside AuthProvider");
+  // Return the context directly since we now have a default value
   return context;
 };
