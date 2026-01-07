@@ -5,6 +5,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import Image from "next/image";
+import { BsArrowRight } from "react-icons/bs";
 import Banner from "@/components/sections/home3/Banner";
 const LegacySlides = [
   {
@@ -498,7 +499,16 @@ To the one who seeks the truth hidden behind the illusion.<br/>
               Join the Journey. Seek the Truth. Shape the Future.
               </h2>
 
-              {/* Subheading */}
+              <div className="my-10 text-2xl items-center font-bold flex gap-[7%] text-white">
+                <p className="flex items-end gap-4">For more About this   <BsArrowRight  /></p>
+                <Link href="https://sufipulse.com/" target="_blank">
+                <button className="bg-white rounded-md px-3 text-xl py-2 text-fixnix-lightpurple">
+                  Click Here!
+                </button>
+                </Link>
+                
+
+              </div>
               
             </div>
           </div>

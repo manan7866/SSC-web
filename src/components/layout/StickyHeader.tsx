@@ -312,6 +312,14 @@ export default function StickyHeader() {
                   Collaborations
                 </Link>
               </li>
+              <li className="mb-2">
+                <Link
+                  href="/#contact"
+                  className="text-fixnix-darkpurple text-[15px] hover:bg-fixnix-darkpurple hover:text-white rounded px-4 py-1 transition-all"
+                >
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </li>
           

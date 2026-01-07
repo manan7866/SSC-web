@@ -99,7 +99,7 @@ const Header2: React.FC<Header2Props> = ({
               )}
 
               {/* Login/Register OR Logout */}
-              <div className="flex items-center justify-center py-2 px-4 hover:bg-fixnix-lightpurple bg-fixnix-white text-fixnix-darkpurple rounded-lg text-sm font-bold transition-all duration-300 space-x-1">
+              <div className="flex items-center justify-center py-2 px-4 hover:bg-blue-400 bg-fixnix-white text-fixnix-darkpurple rounded-lg text-sm font-bold transition-all duration-300 space-x-1">
                 {isAuthenticated ? (
                   <button
                     onClick={handleLogout}

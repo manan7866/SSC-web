@@ -496,7 +496,7 @@ export default function Footer() {
                 healing and research and SufiPulse Studio, where sacred sound
                 meets modern expression.
               </div>
-              <div className="flex items-center justify-center gap-6">
+              <div className="flex items-center footer-link justify-center gap-6">
                 <Link
                   href={"http://dkf.sufisciencecenter.info"}
                   target="_blank"

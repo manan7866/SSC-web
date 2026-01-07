@@ -2435,6 +2435,15 @@ ul {
   color: var(--fixnix-lightpuple);
 }
 
+@media screen and (max-width: 480px) {
+  .footer-link{
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+    
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
