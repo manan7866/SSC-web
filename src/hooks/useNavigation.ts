@@ -9,6 +9,8 @@ export const useNavigation = () => {
 
   useEffect(() => {
     console.log("useNavigation hook effect running");
+    let isCancelled = false; // To prevent state updates on unmounted component
+
     const fetchNavigationData = async () => {
       console.log("Starting to fetch navigation data");
       try {
@@ -23,45 +25,56 @@ export const useNavigation = () => {
 
         console.log("Results from Promise.allSettled:", { explorerResult, academyResult });
 
-        let newExplorerRoutes: NavigationItem[] = [];
-        let newAcademyRoutes: NavigationItem[] = [];
-
         // Handle explorer routes result
         if (explorerResult.status === 'fulfilled') {
           console.log("Explorer routes fulfilled with value:", explorerResult.value);
-          newExplorerRoutes = explorerResult.value || [];
-          setExplorerRoutes(newExplorerRoutes);
+          if (!isCancelled) {
+            setExplorerRoutes(explorerResult.value || []);
+          }
         } else {
           console.error("Explorer routes fetch failed:", explorerResult.reason);
-          newExplorerRoutes = []; // Ensure we set an empty array instead of undefined
-          setExplorerRoutes(newExplorerRoutes);
+          if (!isCancelled) {
+            setExplorerRoutes([]); // Ensure we set an empty array instead of undefined
+          }
         }
 
         // Handle academy routes result
         if (academyResult.status === 'fulfilled') {
           console.log("Academy routes fulfilled with value:", academyResult.value);
-          newAcademyRoutes = academyResult.value || [];
-          setAcademyRoutes(newAcademyRoutes);
+          if (!isCancelled) {
+            setAcademyRoutes(academyResult.value || []);
+          }
         } else {
           console.error("Academy routes fetch failed:", academyResult.reason);
-          newAcademyRoutes = []; // Ensure we set an empty array instead of undefined
-          setAcademyRoutes(newAcademyRoutes);
+          if (!isCancelled) {
+            setAcademyRoutes([]); // Ensure we set an empty array instead of undefined
+          }
         }
 
-        console.log("Final routes set - Explorer:", newExplorerRoutes.length, "Academy:", newAcademyRoutes.length);
+        console.log("Final routes set - Explorer:", (explorerResult.status === 'fulfilled' ? explorerResult.value : []).length,
+                   "Academy:", (academyResult.status === 'fulfilled' ? academyResult.value : []).length);
       } catch (err) {
-        setError("Failed to fetch navigation data");
-        console.error("Navigation fetch error:", err);
-        // Ensure we set empty arrays to prevent undefined values
-        setExplorerRoutes([]);
-        setAcademyRoutes([]);
+        if (!isCancelled) {
+          setError("Failed to fetch navigation data");
+          console.error("Navigation fetch error:", err);
+          // Ensure we set empty arrays to prevent undefined values
+          setExplorerRoutes([]);
+          setAcademyRoutes([]);
+        }
       } finally {
-        setLoading(false);
-        console.log("Navigation fetch completed, loading set to false");
+        if (!isCancelled) {
+          setLoading(false);
+          console.log("Navigation fetch completed, loading set to false");
+        }
       }
     };
 
     fetchNavigationData();
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isCancelled = true;
+    };
   }, []); // Empty dependency array to ensure this only runs once
 
   console.log("useNavigation returning:", {
@@ -72,8 +85,8 @@ export const useNavigation = () => {
   });
 
   return {
-    explorerRoutes: explorerRoutes,
-    academyRoutes: academyRoutes,
+    explorerRoutes,
+    academyRoutes,
     loading,
     error
   };

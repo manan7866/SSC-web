@@ -3,8 +3,42 @@ import Image from "next/image";
 import React from "react";
 import { useNavigation } from "@/hooks/useNavigation";
 
+// Predefined fallback data in case server fetch fails
+const PREDEFINED_EXPLORER_ROUTES = [
+  { slug: "foundationalmatrices", title: "Foundational Matrices", path: "prod/explorer/foundationalmatrices/v1.json" },
+  { slug: "ecologicalintelligence", title: "Ecological Intelligence", path: "prod/explorer/ecologicalintelligence/v1.json" },
+  { slug: "consciousnessgeometries", title: "Consciousness Geometries", path: "prod/explorer/consciousnessgeometries/v1.json" },
+  { slug: "perceptualgateways", title: "Perceptual Gateways", path: "prod/explorer/perceptualgateways/v1.json" },
+  { slug: "realityframeworks", title: "Reality Frameworks", path: "prod/explorer/realityframeworks/v1.json" },
+  { slug: "cosmicharmonics", title: "Cosmic Harmonics", path: "prod/explorer/cosmicharmonics/v1.json" },
+  { slug: "energeticarchitectures", title: "Energetic Architectures", path: "prod/explorer/energeticarchitectures/v1.json" },
+  { slug: "characteralchemy", title: "Character Alchemy", path: "prod/explorer/characteralchemy/v1.json" },
+  { slug: "unitysciences", title: "Unity Sciences", path: "prod/explorer/unitysciences/v1.json" },
+  { slug: "healingmysteries", title: "Healing Mysteries", path: "prod/explorer/healingmysteries/v1.json" },
+  { slug: "wisdomtransmission", title: "Wisdom Transmission", path: "prod/explorer/wisdomtransmission/v1.json" },
+  { slug: "sacredartistry", title: "Sacred Artistry", path: "prod/explorer/sacredartistry/v1.json" },
+  { slug: "advancedtechnologies", title: "Advanced Technologies", path: "prod/explorer/advancedtechnologies/v1.json" }
+];
+
+const PREDEFINED_ACADEMY_ROUTES = [
+  { slug: "dialogseries", title: "Dialog Series", path: "prod/academy/dialogseries/v1.json" },
+  { slug: "hardtalk", title: "Hard Talk Series", path: "prod/academy/hardtalk/v1.json" },
+  { slug: "sacredprofessions", title: "Sufi Professions", path: "prod/academy/sacredprofessions/v1.json" },
+  { slug: "inspiringinterview", title: "Inspiring Interviews", path: "prod/academy/inspiringinterview/v1.json" }
+];
+
 export default function Menu() {
-  const { explorerRoutes, academyRoutes, loading } = useNavigation();
+  const { explorerRoutes, academyRoutes, loading, error } = useNavigation();
+
+  // Use predefined fallback data if the hook returns empty arrays after loading
+  const safeExplorerRoutes = (!loading && explorerRoutes.length === 0) ? PREDEFINED_EXPLORER_ROUTES : explorerRoutes;
+  const safeAcademyRoutes = (!loading && academyRoutes.length === 0) ? PREDEFINED_ACADEMY_ROUTES : academyRoutes;
+
+  // Debug logging
+  console.log("Menu component - explorerRoutes length:", safeExplorerRoutes?.length || 0);
+  console.log("Menu component - academyRoutes length:", safeAcademyRoutes?.length || 0);
+  console.log("Menu component - loading state:", loading);
+  console.log("Menu component - error state:", error);
   
   return (
     <>
@@ -197,7 +231,7 @@ export default function Menu() {
             {loading ? (
               <li className="mb-2 p-4 text-center text-gray-500">Loading...</li>
             ) : (
-              explorerRoutes.map((route) => (
+              safeExplorerRoutes.map((route) => (
                 <li key={route.slug} className="mb-2">
                   <Link
                     href={`/explore/${route.slug}`}
@@ -223,7 +257,7 @@ export default function Menu() {
             {loading ? (
               <li className="mb-2 p-4 text-center text-gray-500">Loading...</li>
             ) : (
-              academyRoutes.map((route) => (
+              safeAcademyRoutes.map((route) => (
                 <li key={route.slug} className="mb-2">
                   <Link
                     href={`/academy/${route.slug}`}
