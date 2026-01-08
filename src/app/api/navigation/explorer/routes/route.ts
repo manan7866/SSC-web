@@ -1,30 +1,25 @@
 import { NextRequest } from 'next/server';
-import axios from 'axios';
-import { config } from '@/lib/config';
+import { readCmsContent } from '@/lib/cmsReader';
+
+// Helper function to create a timeout promise
+function timeout(ms: number) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+}
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the API URL for explorer routes
-    const apiUrl = `${config.API_BASE_URL}/content/explorer`;
+    console.log('Attempting to fetch explorer routes from CMS at localhost:3010');
 
-    console.log('Attempting to fetch explorer routes from:', apiUrl);
+    // Fetch content from CMS with timeout to prevent hanging requests
+    const contentPromise = readCmsContent('explorer');
+    const timeoutPromise = timeout(5000); // 5 second timeout
 
-    // Make server-side request to external API
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      // Add timeout to prevent hanging requests
-      timeout: 10000,
-    });
+    const content = await Promise.race([contentPromise, timeoutPromise]) as any;
 
-    console.log('Explorer routes fetch successful:', response.status);
+    console.log('Explorer routes fetch successful from CMS:', content.status);
 
-    // Return the data from the external API
-    return new Response(JSON.stringify(response.data), {
+    // Return the data from the CMS
+    return new Response(JSON.stringify(content), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -32,48 +27,19 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Error fetching explorer routes:', error);
+    console.error('Error fetching explorer routes from CMS:', error);
 
     // Log the specific error for debugging
     console.error('Explorer routes error details:', {
       message: error.message,
-      code: error.code,
-      status: error.response?.status,
-      data: error.response?.data
+      stack: error.stack
     });
-
-    // If there's a network error, try to make the request without some headers that might cause issues
-    if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      try {
-        console.log('Retrying explorer routes fetch with minimal headers...');
-
-        const apiUrl = `${config.API_BASE_URL}/content/explorer`;
-        const response = await axios.get(apiUrl, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          timeout: 15000, // Slightly longer timeout for retry
-        });
-
-        console.log('Explorer routes fetch successful on retry:', response.status);
-
-        return new Response(JSON.stringify(response.data), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-          },
-        });
-      } catch (retryError) {
-        console.error('Retry also failed for explorer routes:', retryError);
-      }
-    }
 
     // Return fallback data in case of error
     const fallbackData = {
       success: true,
       status: 200,
-      message: 'Using fallback data',
+      message: 'Using fallback data due to CMS connection issue',
       data: {
         items: [
           { slug: "foundationalmatrices", title: "Foundational Matrices", path: "prod/explorer/foundationalmatrices/v1.json" },

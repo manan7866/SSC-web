@@ -1,30 +1,25 @@
 import { NextRequest } from 'next/server';
-import axios from 'axios';
-import { config } from '@/lib/config';
+import { readCmsContent } from '@/lib/cmsReader';
+
+// Helper function to create a timeout promise
+function timeout(ms: number) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+}
 
 export async function GET(request: NextRequest) {
   try {
-    // Get the API URL for academy routes
-    const apiUrl = `${config.API_BASE_URL}/content/academy`;
+    console.log('Attempting to fetch academy routes from CMS at localhost:3010');
 
-    console.log('Attempting to fetch academy routes from:', apiUrl);
+    // Fetch content from CMS with timeout to prevent hanging requests
+    const contentPromise = readCmsContent('academy');
+    const timeoutPromise = timeout(5000); // 5 second timeout
 
-    // Make server-side request to external API
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      // Add timeout to prevent hanging requests
-      timeout: 10000,
-    });
+    const content = await Promise.race([contentPromise, timeoutPromise]) as any;
 
-    console.log('Academy routes fetch successful:', response.status);
+    console.log('Academy routes fetch successful from CMS:', content.status);
 
-    // Return the data from the external API
-    return new Response(JSON.stringify(response.data), {
+    // Return the data from the CMS
+    return new Response(JSON.stringify(content), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -32,48 +27,19 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Error fetching academy routes:', error);
+    console.error('Error fetching academy routes from CMS:', error);
 
     // Log the specific error for debugging
     console.error('Academy routes error details:', {
       message: error.message,
-      code: error.code,
-      status: error.response?.status,
-      data: error.response?.data
+      stack: error.stack
     });
-
-    // If there's a network error, try to make the request without some headers that might cause issues
-    if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      try {
-        console.log('Retrying academy routes fetch with minimal headers...');
-
-        const apiUrl = `${config.API_BASE_URL}/content/academy`;
-        const response = await axios.get(apiUrl, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          timeout: 15000, // Slightly longer timeout for retry
-        });
-
-        console.log('Academy routes fetch successful on retry:', response.status);
-
-        return new Response(JSON.stringify(response.data), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-          },
-        });
-      } catch (retryError) {
-        console.error('Retry also failed for academy routes:', retryError);
-      }
-    }
 
     // Return fallback data in case of error
     const fallbackData = {
       success: true,
       status: 200,
-      message: 'Using fallback data',
+      message: 'Using fallback data due to CMS connection issue',
       data: {
         items: [
           { slug: "dialogseries", title: "Dialog Series", path: "prod/academy/dialogseries/v1.json" },

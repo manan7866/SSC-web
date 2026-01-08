@@ -1,6 +1,10 @@
 import { NextRequest } from 'next/server';
-import axios from 'axios';
-import { config } from '@/lib/config';
+import { readCmsContent, readSpecificCmsContent } from '@/lib/cmsReader';
+
+// Helper function to create a timeout promise
+function timeout(ms: number) {
+  return new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), ms));
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -17,33 +21,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    let apiUrl;
+    let content;
     if (slug) {
-      // Fetch specific content
-      apiUrl = `${config.API_BASE_URL}/content/${section}/${slug}`;
+      // Fetch specific content with timeout
+      console.log(`Attempting to fetch specific content from CMS: ${section}/${slug}`);
+      const contentPromise = readSpecificCmsContent(section, slug);
+      const timeoutPromise = timeout(5000); // 5 second timeout
+      content = await Promise.race([contentPromise, timeoutPromise]) as any;
     } else {
-      // Fetch content list for section
-      apiUrl = `${config.API_BASE_URL}/content/${section}`;
+      // Fetch content list for section with timeout
+      console.log(`Attempting to fetch content list from CMS: ${section}`);
+      const contentPromise = readCmsContent(section);
+      const timeoutPromise = timeout(5000); // 5 second timeout
+      content = await Promise.race([contentPromise, timeoutPromise]) as any;
     }
 
-    console.log('Attempting to fetch content from:', apiUrl);
+    console.log('Content fetch successful from CMS:', content.status);
 
-    // Make server-side request to external API
-    const response = await axios.get(apiUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0',
-      },
-      // Add timeout to prevent hanging requests
-      timeout: 10000,
-    });
-
-    console.log('Content fetch successful:', response.status);
-
-    // Return the data from the external API
-    return new Response(JSON.stringify(response.data), {
+    // Return the data from the CMS
+    return new Response(JSON.stringify(content), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -51,68 +47,18 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
-    console.error('Error fetching content:', error);
+    console.error('Error fetching content from CMS:', error);
 
     // Log the specific error for debugging
     console.error('Content fetch error details:', {
       message: error.message,
-      code: error.code,
-      status: error.response?.status,
-      data: error.response?.data
+      stack: error.stack
     });
-
-    // If there's a network error, try to make the request without some headers that might cause issues
-    if (error.code === 'ECONNABORTED' || error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
-      try {
-        console.log('Retrying content fetch with minimal headers...');
-
-        const { searchParams } = new URL(request.url);
-        const section = searchParams.get('section');
-        const slug = searchParams.get('slug');
-
-        if (!section) {
-          return new Response(JSON.stringify({ error: 'Section parameter is required' }), {
-            status: 400,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-        }
-
-        let apiUrl;
-        if (slug) {
-          // Fetch specific content
-          apiUrl = `${config.API_BASE_URL}/content/${section}/${slug}`;
-        } else {
-          // Fetch content list for section
-          apiUrl = `${config.API_BASE_URL}/content/${section}`;
-        }
-
-        const response = await axios.get(apiUrl, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          timeout: 15000, // Slightly longer timeout for retry
-        });
-
-        console.log('Content fetch successful on retry:', response.status);
-
-        return new Response(JSON.stringify(response.data), {
-          status: 200,
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-          },
-        });
-      } catch (retryError) {
-        console.error('Retry also failed for content:', retryError);
-      }
-    }
 
     // Return error response
     return new Response(JSON.stringify({
       success: false,
-      message: error.message || 'Failed to fetch content',
+      message: error.message || 'Failed to fetch content from CMS',
       data: null
     }), {
       status: 500,
