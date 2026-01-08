@@ -23,25 +23,32 @@ export const useNavigation = () => {
 
         console.log("Results from Promise.allSettled:", { explorerResult, academyResult });
 
+        let newExplorerRoutes: NavigationItem[] = [];
+        let newAcademyRoutes: NavigationItem[] = [];
+
         // Handle explorer routes result
         if (explorerResult.status === 'fulfilled') {
           console.log("Explorer routes fulfilled with value:", explorerResult.value);
-          setExplorerRoutes(explorerResult.value || []);
+          newExplorerRoutes = explorerResult.value || [];
+          setExplorerRoutes(newExplorerRoutes);
         } else {
           console.error("Explorer routes fetch failed:", explorerResult.reason);
-          setExplorerRoutes([]); // Ensure we set an empty array instead of undefined
+          newExplorerRoutes = []; // Ensure we set an empty array instead of undefined
+          setExplorerRoutes(newExplorerRoutes);
         }
 
         // Handle academy routes result
         if (academyResult.status === 'fulfilled') {
           console.log("Academy routes fulfilled with value:", academyResult.value);
-          setAcademyRoutes(academyResult.value || []);
+          newAcademyRoutes = academyResult.value || [];
+          setAcademyRoutes(newAcademyRoutes);
         } else {
           console.error("Academy routes fetch failed:", academyResult.reason);
-          setAcademyRoutes([]); // Ensure we set an empty array instead of undefined
+          newAcademyRoutes = []; // Ensure we set an empty array instead of undefined
+          setAcademyRoutes(newAcademyRoutes);
         }
 
-        console.log("Final routes set - Explorer:", explorerRoutes.length, "Academy:", academyRoutes.length);
+        console.log("Final routes set - Explorer:", newExplorerRoutes.length, "Academy:", newAcademyRoutes.length);
       } catch (err) {
         setError("Failed to fetch navigation data");
         console.error("Navigation fetch error:", err);
@@ -55,7 +62,7 @@ export const useNavigation = () => {
     };
 
     fetchNavigationData();
-  }, []);
+  }, []); // Empty dependency array to ensure this only runs once
 
   console.log("useNavigation returning:", {
     explorerRoutesCount: explorerRoutes.length,
@@ -65,8 +72,8 @@ export const useNavigation = () => {
   });
 
   return {
-    explorerRoutes: explorerRoutes || [],
-    academyRoutes: academyRoutes || [],
+    explorerRoutes: explorerRoutes,
+    academyRoutes: academyRoutes,
     loading,
     error
   };
