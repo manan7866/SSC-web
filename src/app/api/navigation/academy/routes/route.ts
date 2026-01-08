@@ -8,7 +8,7 @@ function timeout(ms: number) {
 
 export async function GET(request: NextRequest) {
   try {
-    console.log('Attempting to fetch academy routes from CMS at localhost:3010');
+    console.log('Attempting to fetch academy routes from deployed CMS at https://ssc-cms.vercel.app');
 
     // Fetch content from CMS with timeout to prevent hanging requests
     const contentPromise = readCmsContent('academy');

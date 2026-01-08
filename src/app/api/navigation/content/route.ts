@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     let content;
     if (slug) {
       // Fetch specific content with timeout
-      console.log(`Attempting to fetch specific content from CMS: ${section}/${slug}`);
+      console.log(`Attempting to fetch specific content from deployed CMS: ${section}/${slug}`);
       const contentPromise = readSpecificCmsContent(section, slug);
       const timeoutPromise = timeout(5000); // 5 second timeout
       content = await Promise.race([contentPromise, timeoutPromise]) as any;
