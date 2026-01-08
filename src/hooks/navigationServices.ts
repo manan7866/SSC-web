@@ -33,6 +33,7 @@ export const navigationServices = {
       return result.data?.items || [];
     } catch (error) {
       console.error("Error fetching explorer routes:", error);
+      console.log("Returning fallback data for explorer routes");
       // Fallback to default routes if API fails
       return [
         { slug: "foundationalmatrices", title: "Foundational Matrices", path: "prod/explorer/foundationalmatrices/v1.json" },
@@ -72,6 +73,7 @@ export const navigationServices = {
       return result.data?.items || [];
     } catch (error) {
       console.error("Error fetching academy routes:", error);
+      console.log("Returning fallback data for academy routes");
       // Fallback to default routes if API fails
       return [
         { slug: "dialogseries", title: "Dialog Series", path: "prod/academy/dialogseries/v1.json" },
