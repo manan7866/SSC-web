@@ -12,11 +12,12 @@ export async function GET(request: NextRequest) {
 
     // Fetch content from CMS with timeout to prevent hanging requests
     const contentPromise = readCmsContent('explorer');
-    const timeoutPromise = timeout(5000); // 5 second timeout
+    const timeoutPromise = timeout(8000); // Increased timeout for deployment
 
     const content = await Promise.race([contentPromise, timeoutPromise]) as any;
 
-    console.log('Explorer routes fetch successful from CMS:', content.status);
+    console.log('Explorer routes fetch successful from CMS:', content.status, content.message);
+    console.log('Explorer routes data length:', content.data?.items?.length || 0);
 
     // Return the data from the CMS
     return new Response(JSON.stringify(content), {
@@ -24,6 +25,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   } catch (error: any) {
@@ -59,11 +61,14 @@ export async function GET(request: NextRequest) {
       }
     };
 
+    console.log('Returning fallback data for explorer routes:', fallbackData.data.items.length);
+
     return new Response(JSON.stringify(fallbackData), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Access-Control-Allow-Origin': '*',
       },
     });
   }
