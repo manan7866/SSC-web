@@ -100,13 +100,16 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
     ];
 
     console.log(`Attempting to fetch content from deployed CMS for section: ${section}`);
+    console.log(`Base CMS URL being used: ${CMS_BASE_URL}`);
 
     // First try network endpoints
     let response = await tryMultipleEndpoints(possibleEndpoints);
 
     if (response) {
       console.log(`Successfully fetched content from deployed CMS: ${response.url}`);
+      console.log(`Response status: ${response.status}`);
       const data = await response.json();
+      console.log(`Received data items count: ${Array.isArray(data) ? data.length : (data.items ? data.items.length : 0)}`);
 
       // Format the response to match the expected API format
       return {
@@ -217,13 +220,16 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
     ];
 
     console.log(`Attempting to fetch specific content from deployed CMS: ${section}/${slug}`);
+    console.log(`Base CMS URL being used: ${CMS_BASE_URL}`);
 
     // First try network endpoints
     let response = await tryMultipleEndpoints(possibleEndpoints);
 
     if (response) {
       console.log(`Successfully fetched specific content from deployed CMS: ${response.url}`);
+      console.log(`Response status: ${response.status}`);
       const data = await response.json();
+      console.log(`Received specific content data`);
 
       return {
         success: true,
