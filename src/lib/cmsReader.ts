@@ -118,10 +118,91 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
         } catch (textError) {
           console.error(`Failed to read raw response:`, textError);
         }
+
+        // Return fallback data when JSON parsing fails
+        let fallbackItems: NavigationItem[] = [];
+        switch (section) {
+          case 'explorer':
+            fallbackItems = [
+              { slug: "foundationalmatrices", title: "Foundational Matrices", path: "prod/explorer/foundationalmatrices/v1.json" },
+              { slug: "ecologicalintelligence", title: "Ecological Intelligence", path: "prod/explorer/ecologicalintelligence/v1.json" },
+              { slug: "consciousnessgeometries", title: "Consciousness Geometries", path: "prod/explorer/consciousnessgeometries/v1.json" },
+              { slug: "perceptualgateways", title: "Perceptual Gateways", path: "prod/explorer/perceptualgateways/v1.json" },
+              { slug: "realityframeworks", title: "Reality Frameworks", path: "prod/explorer/realityframeworks/v1.json" },
+              { slug: "cosmicharmonics", title: "Cosmic Harmonics", path: "prod/explorer/cosmicharmonics/v1.json" },
+              { slug: "energeticarchitectures", title: "Energetic Architectures", path: "prod/explorer/energeticarchitectures/v1.json" },
+              { slug: "characteralchemy", title: "Character Alchemy", path: "prod/explorer/characteralchemy/v1.json" },
+              { slug: "unitysciences", title: "Unity Sciences", path: "prod/explorer/unitysciences/v1.json" },
+              { slug: "healingmysteries", title: "Healing Mysteries", path: "prod/explorer/healingmysteries/v1.json" },
+              { slug: "wisdomtransmission", title: "Wisdom Transmission", path: "prod/explorer/wisdomtransmission/v1.json" },
+              { slug: "sacredartistry", title: "Sacred Artistry", path: "prod/explorer/sacredartistry/v1.json" },
+              { slug: "advancedtechnologies", title: "Advanced Technologies", path: "prod/explorer/advancedtechnologies/v1.json" }
+            ];
+            break;
+          case 'academy':
+            fallbackItems = [
+              { slug: "dialogseries", title: "Dialog Series", path: "prod/academy/dialogseries/v1.json" },
+              { slug: "hardtalk", title: "Hard Talk Series", path: "prod/academy/hardtalk/v1.json" },
+              { slug: "sacredprofessions", title: "Sufi Professions", path: "prod/academy/sacredprofessions/v1.json" },
+              { slug: "inspiringinterview", title: "Inspiring Interviews", path: "prod/academy/inspiringinterview/v1.json" }
+            ];
+            break;
+          default:
+            fallbackItems = [];
+        }
+
+        return {
+          success: true,
+          status: 200,
+          message: 'Using fallback data due to JSON parsing error',
+          data: {
+            items: fallbackItems
+          }
+        };
       }
     } else {
       console.log(`All network endpoints failed for section: ${section}`);
-      throw new Error(`CMS endpoint failed for section: ${section}`);
+
+      // Return fallback data when no response
+      let fallbackItems: NavigationItem[] = [];
+      switch (section) {
+        case 'explorer':
+          fallbackItems = [
+            { slug: "foundationalmatrices", title: "Foundational Matrices", path: "prod/explorer/foundationalmatrices/v1.json" },
+            { slug: "ecologicalintelligence", title: "Ecological Intelligence", path: "prod/explorer/ecologicalintelligence/v1.json" },
+            { slug: "consciousnessgeometries", title: "Consciousness Geometries", path: "prod/explorer/consciousnessgeometries/v1.json" },
+            { slug: "perceptualgateways", title: "Perceptual Gateways", path: "prod/explorer/perceptualgateways/v1.json" },
+            { slug: "realityframeworks", title: "Reality Frameworks", path: "prod/explorer/realityframeworks/v1.json" },
+            { slug: "cosmicharmonics", title: "Cosmic Harmonics", path: "prod/explorer/cosmicharmonics/v1.json" },
+            { slug: "energeticarchitectures", title: "Energetic Architectures", path: "prod/explorer/energeticarchitectures/v1.json" },
+            { slug: "characteralchemy", title: "Character Alchemy", path: "prod/explorer/characteralchemy/v1.json" },
+            { slug: "unitysciences", title: "Unity Sciences", path: "prod/explorer/unitysciences/v1.json" },
+            { slug: "healingmysteries", title: "Healing Mysteries", path: "prod/explorer/healingmysteries/v1.json" },
+            { slug: "wisdomtransmission", title: "Wisdom Transmission", path: "prod/explorer/wisdomtransmission/v1.json" },
+            { slug: "sacredartistry", title: "Sacred Artistry", path: "prod/explorer/sacredartistry/v1.json" },
+            { slug: "advancedtechnologies", title: "Advanced Technologies", path: "prod/explorer/advancedtechnologies/v1.json" }
+          ];
+          break;
+        case 'academy':
+          fallbackItems = [
+            { slug: "dialogseries", title: "Dialog Series", path: "prod/academy/dialogseries/v1.json" },
+            { slug: "hardtalk", title: "Hard Talk Series", path: "prod/academy/hardtalk/v1.json" },
+            { slug: "sacredprofessions", title: "Sufi Professions", path: "prod/academy/sacredprofessions/v1.json" },
+            { slug: "inspiringinterview", title: "Inspiring Interviews", path: "prod/academy/inspiringinterview/v1.json" }
+          ];
+          break;
+        default:
+          fallbackItems = [];
+      }
+
+      return {
+        success: true,
+        status: 200,
+        message: 'Using fallback data due to network failure',
+        data: {
+          items: fallbackItems
+        }
+      };
     }
   } catch (error) {
     console.error(`Error fetching CMS content for section '${section}' from ${CMS_BASE_URL}:`, error);
@@ -254,22 +335,4 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
         }
       };
     }
-  } catch (error) {
-    console.error(`Error fetching specific content for section '${section}' and slug '${slug}' from CMS:`, error);
-
-    return {
-      success: false,
-      status: 500,
-      message: 'Error occurred while fetching content',
-      data: {
-        id: `${section}-${slug}`,
-        section: section as any,
-        slug: slug,
-        title: `${section} - ${slug}`,
-        blocks: [],
-        version: 1,
-        updatedAt: new Date().toISOString()
-      }
-    };
-  }
 }
