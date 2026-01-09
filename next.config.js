@@ -139,13 +139,32 @@ const nextConfig = {
       process.env.NEXT_PUBLIC_BACKEND_URL ||
       "https://api.sufisciencecenter.info";
 
-    return [
-      // API proxy to backend
-      {
-        source: "/v1/:path*",
-        destination: `${backendUrl}/v1/:path*`,
-      },
-    ];
+    // Only proxy CMS requests in development mode
+    if (process.env.NODE_ENV !== 'production') {
+      const cmsUrl = process.env.NEXT_PUBLIC_CMS_URL || "http://localhost:3010";
+
+      return [
+        // API proxy to backend
+        {
+          source: "/v1/:path*",
+          destination: `${backendUrl}/v1/:path*`,
+        },
+        // Proxy CMS content API requests to the local CMS server in development
+        {
+          source: "/api/content/:path*",
+          destination: `${cmsUrl}/api/content/:path*`,
+        },
+      ];
+    } else {
+      // In production, no proxy needed for CMS - it will connect directly to the deployed CMS
+      return [
+        // API proxy to backend
+        {
+          source: "/v1/:path*",
+          destination: `${backendUrl}/v1/:path*`,
+        },
+      ];
+    }
   },
 };
 
