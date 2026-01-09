@@ -1,4 +1,4 @@
-// Define the path to the CMS content directory - Updated to reflect the actual CMS location
+// Define the path to the CMS content directory - Updated to reflect the actual deployed CMS location
 const CMS_BASE_URL = 'https://ssc-cms.vercel.app'; // Base URL for the deployed CMS
 
 // Import for Node.js file system access in API routes
@@ -21,7 +21,7 @@ export interface CmsContent {
 }
 
 /**
- * Fetches content from the CMS running on localhost:3010 with timeout
+ * Fetches content from the deployed CMS with timeout
  */
 async function fetchWithTimeout(url: string, options: RequestInit = {}, timeout = 5000): Promise<Response> {
   const controller = new AbortController();
@@ -47,12 +47,28 @@ async function tryMultipleEndpoints(endpoints: string[]): Promise<Response | nul
   for (const endpoint of endpoints) {
     try {
       console.log(`Trying CMS endpoint: ${endpoint}`);
-      const response = await fetchWithTimeout(endpoint, {}, 5000);
+      const response = await fetchWithTimeout(endpoint, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache',
+          'User-Agent': 'SSC-Frontend/1.0',
+          'Origin': 'https://ssc-web-pearl.vercel.app' // Specify origin for CORS
+        },
+        method: 'GET'
+      }, 10000); // Increased timeout to 10 seconds
       if (response.ok) {
-        console.log(`Success with endpoint: ${endpoint}`);
+        console.log(`Success with endpoint: ${endpoint}, status: ${response.status}`);
         return response;
       } else {
         console.log(`Endpoint returned status ${response.status}: ${endpoint}`);
+        // Try to get error details if possible
+        try {
+          const errorText = await response.text();
+          console.log(`Error response: ${errorText.substring(0, 200)}...`); // First 200 chars
+        } catch (e) {
+          console.log(`Could not read error response: ${e}`);
+        }
       }
     } catch (error) {
       console.log(`Failed to fetch from endpoint: ${endpoint}`, error);
@@ -81,45 +97,61 @@ async function readLocalFile(filePath: string): Promise<any> {
  */
 export async function readCmsContent(section: string): Promise<CmsContent> {
   try {
-    // Try multiple possible endpoint patterns for the CMS - including static JSON files
+    // Try multiple possible endpoint patterns for the deployed CMS - including static JSON files
     const possibleEndpoints = [
-      // API endpoints
+      // Most common API endpoints for content management systems
       `${CMS_BASE_URL}/api/content/${section}`,
-      `${CMS_BASE_URL}/content/${section}`,
       `${CMS_BASE_URL}/api/${section}`,
-      `${CMS_BASE_URL}/${section}`,
+      `${CMS_BASE_URL}/api/pages/${section}`,
       `${CMS_BASE_URL}/api/v1/content/${section}`,
+      `${CMS_BASE_URL}/api/v1/${section}`,
+
+      // Alternative patterns
+      `${CMS_BASE_URL}/${section}`,
+      `${CMS_BASE_URL}/content/${section}`,
       `${CMS_BASE_URL}/v1/content/${section}`,
 
-      // Static JSON files (based on your content structure)
+      // Static JSON files (most likely if CMS publishes static content)
       `${CMS_BASE_URL}/content/prod/${section}/v1.json`,
       `${CMS_BASE_URL}/prod/${section}/v1.json`,
       `${CMS_BASE_URL}/content/${section}/index.json`,
       `${CMS_BASE_URL}/data/${section}.json`,
       `${CMS_BASE_URL}/content/${section}.json`,
+      `${CMS_BASE_URL}/${section}/index.json`,
     ];
 
     console.log(`Attempting to fetch content from deployed CMS for section: ${section}`);
-    console.log(`Base CMS URL being used: ${CMS_BASE_URL}`);
 
     // First try network endpoints
     let response = await tryMultipleEndpoints(possibleEndpoints);
 
     if (response) {
       console.log(`Successfully fetched content from deployed CMS: ${response.url}`);
-      console.log(`Response status: ${response.status}`);
-      const data = await response.json();
-      console.log(`Received data items count: ${Array.isArray(data) ? data.length : (data.items ? data.items.length : 0)}`);
+      try {
+        const data = await response.json();
+        console.log(`Received data from CMS:`, data);
 
-      // Format the response to match the expected API format
-      return {
-        success: true,
-        status: 200,
-        message: 'Successfully loaded from deployed CMS',
-        data: {
-          items: Array.isArray(data) ? data : (data.items || [])
+        // Format the response to match the expected API format
+        return {
+          success: true,
+          status: 200,
+          message: 'Successfully loaded from deployed CMS',
+          data: {
+            items: Array.isArray(data) ? data : (data.items || [])
+          }
+        };
+      } catch (parseError) {
+        console.error(`Failed to parse JSON response from CMS:`, parseError);
+        // If JSON parsing fails, try to get text response for debugging
+        try {
+          const textResponse = await response.text();
+          console.log(`Raw response from CMS:`, textResponse.substring(0, 500));
+        } catch (textError) {
+          console.error(`Failed to read raw response:`, textError);
         }
-      };
+      }
+    } else {
+      console.log(`All network endpoints failed for section: ${section}`);
     }
 
     // If network requests fail, try local file system
@@ -127,9 +159,9 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
 
     // Define possible local file paths based on your project structure
     const localPaths = [
-      path.join(process.cwd(), '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'),
-      path.join(process.cwd(), '..', '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'),
-      path.join('E:', 'SSC projects', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'),
+      path.join('E:', 'SSC projects', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'), // Absolute path to CMS project
+      path.join(process.cwd(), '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'), // Relative path from frontend
+      path.resolve(__dirname, '..', '..', '..', '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, 'v1.json'), // Alternative absolute path
       path.join(process.cwd(), 'content', 'prod', section, 'v1.json'), // relative to current project
     ];
 
@@ -203,33 +235,35 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
   try {
     // Try multiple possible endpoint patterns for specific content - including static JSON files
     const possibleEndpoints = [
-      // API endpoints
+      // Most common API endpoints for content management systems
       `${CMS_BASE_URL}/api/content/${section}/${slug}`,
-      `${CMS_BASE_URL}/content/${section}/${slug}`,
       `${CMS_BASE_URL}/api/${section}/${slug}`,
-      `${CMS_BASE_URL}/${section}/${slug}`,
+      `${CMS_BASE_URL}/api/pages/${section}/${slug}`,
       `${CMS_BASE_URL}/api/v1/content/${section}/${slug}`,
+      `${CMS_BASE_URL}/api/v1/${section}/${slug}`,
+
+      // Alternative patterns
+      `${CMS_BASE_URL}/${section}/${slug}`,
+      `${CMS_BASE_URL}/content/${section}/${slug}`,
       `${CMS_BASE_URL}/v1/content/${section}/${slug}`,
 
-      // Static JSON files (based on your content structure)
+      // Static JSON files (most likely if CMS publishes static content)
       `${CMS_BASE_URL}/content/prod/${section}/${slug}/v1.json`,
       `${CMS_BASE_URL}/prod/${section}/${slug}/v1.json`,
       `${CMS_BASE_URL}/content/${section}/${slug}/index.json`,
       `${CMS_BASE_URL}/data/${section}/${slug}.json`,
       `${CMS_BASE_URL}/content/${section}/${slug}.json`,
+      `${CMS_BASE_URL}/${section}/${slug}/index.json`,
     ];
 
     console.log(`Attempting to fetch specific content from deployed CMS: ${section}/${slug}`);
-    console.log(`Base CMS URL being used: ${CMS_BASE_URL}`);
 
     // First try network endpoints
     let response = await tryMultipleEndpoints(possibleEndpoints);
 
     if (response) {
       console.log(`Successfully fetched specific content from deployed CMS: ${response.url}`);
-      console.log(`Response status: ${response.status}`);
       const data = await response.json();
-      console.log(`Received specific content data`);
 
       return {
         success: true,
@@ -244,9 +278,9 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
 
     // Define possible local file paths based on your project structure
     const localPaths = [
-      path.join(process.cwd(), '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'),
-      path.join(process.cwd(), '..', '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'),
-      path.join('E:', 'SSC projects', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'),
+      path.join('E:', 'SSC projects', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'), // Absolute path to CMS project
+      path.join(process.cwd(), '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'), // Relative path from frontend
+      path.resolve(__dirname, '..', '..', '..', '..', 'SSC-CMS-Hamza-main', 'content', 'prod', section, slug, 'v1.json'), // Alternative absolute path
       path.join(process.cwd(), 'content', 'prod', section, slug, 'v1.json'), // relative to current project
     ];
 
