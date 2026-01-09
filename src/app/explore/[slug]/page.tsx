@@ -272,25 +272,29 @@ export default function ExplorerPage() {
     );
   }
 
-  // Find the heroSlider block once
-  const heroSliderBlock = data.blocks.find((b: any) => b.type === "heroSlider");
-  const sectionHeaderBlocks =
-    data.blocks?.filter((b: any) => b.type === "sectionHeader") || [];
-  const sidebarBlocks =
-    data.blocks?.filter((b: any) => b.type === "sidebar") || [];
-  const mainContentBlocks =
-    data.blocks?.filter(
-      (b: any) =>
-        b.type === "featureList" ||
-        b.type === "imageTextSplit" ||
-        b.type === "richText" ||
-        b.type === "cardGrid"
-    ) || [];
+  // Safely access blocks with null check
+  const blocks = data.blocks || [];
+  const heroSliderBlock = Array.isArray(blocks) ? blocks.find((b: any) => b.type === "heroSlider") : null;
+  const sectionHeaderBlocks = Array.isArray(blocks)
+    ? blocks.filter((b: any) => b.type === "sectionHeader")
+    : [];
+  const sidebarBlocks = Array.isArray(blocks)
+    ? blocks.filter((b: any) => b.type === "sidebar")
+    : [];
+  const mainContentBlocks = Array.isArray(blocks)
+    ? blocks.filter(
+        (b: any) =>
+          b.type === "featureList" ||
+          b.type === "imageTextSplit" ||
+          b.type === "richText" ||
+          b.type === "cardGrid"
+      )
+    : [];
 
   // Debug information (remove in production)
   const debugInfo = {
-    totalBlocks: data.blocks?.length || 0,
-    blockTypes: data.blocks?.map((b: any) => b.type) || [],
+    totalBlocks: Array.isArray(blocks) ? blocks.length : 0,
+    blockTypes: Array.isArray(blocks) ? blocks.map((b: any) => b.type) : [],
     heroSlider: !!heroSliderBlock,
     sectionHeaders: sectionHeaderBlocks.length,
     sidebars: sidebarBlocks.length,

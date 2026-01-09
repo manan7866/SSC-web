@@ -11,9 +11,10 @@ const getInterviewee = (d: ContentItem | null) => {
 if (!d) return "";
 // @ts-ignore
 if ((d as any).byline) return (d as any).byline as string;
+const blocks = d.blocks || [];
 const title =
 d.title ||
-d.blocks?.find?.((b: any) => b.type === "heroSection")?.title;
+(Array.isArray(blocks) ? blocks.find?.((b: any) => b.type === "heroSection")?.title : null);
 const m = title?.match(/Inspiring Interview:\s*(.+)$/i);
 return m ? m[1].trim() : "";
 };
@@ -772,7 +773,7 @@ const intervieweeName = getInterviewee(data);
     <Layout headerStyle={2} footerStyle={1} breadcrumbTitle={data.title}>
       <div className="bg-gradient-to-b from-white to-gray-100">
         <div className="px-6 py-20 max-w-4xl mx-auto text-gray-800">
-          {data.blocks.map((block: any, index: number) =>
+          {(Array.isArray(data.blocks) ? data.blocks : []).map((block: any, index: number) =>
             renderBlock(block, index)
           )}
         </div>

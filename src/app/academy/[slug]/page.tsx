@@ -198,8 +198,9 @@ export default function AcademyPage() {
   if (loading) return <div className="p-8">Loading...</div>;
   if (!data) return <div className="p-8">Not found</div>;
 
-  // Find the heroSlider block once
-  const heroSliderBlock = data.blocks.find((b: any) => b.type === "heroSlider");
+  // Safely access blocks with null check
+  const blocks = data.blocks || [];
+  const heroSliderBlock = Array.isArray(blocks) ? blocks.find((b: any) => b.type === "heroSlider") : null;
 
   return (
     <Layout headerStyle={2} footerStyle={1}>
@@ -209,11 +210,14 @@ export default function AcademyPage() {
       <section className="team-top text-left-mobile">
         <div className="container mx-auto px-4 text-left-mobile">
           {/* Section header, if present */}
-          {data.blocks
-            .filter((b: any) => b.type === "sectionHeader")
-            .map((b: Block, i: number) => (
-              <BlockRenderer key={`header-${i}`} block={b} />
-            ))}
+          {Array.isArray(blocks)
+            ? blocks
+                .filter((b: any) => b.type === "sectionHeader")
+                .map((b: Block, i: number) => (
+                  <BlockRenderer key={`header-${i}`} block={b} />
+                ))
+            : []
+          }
         </div>
       </section>
 
@@ -222,9 +226,10 @@ export default function AcademyPage() {
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Sidebar column */}
             <div className="lg:col-span-1 space-y-6">
-              {data.blocks
-                .filter((b: any) => b.type === "sidebar")
-                .map((b: Block, i: number) => (
+              {Array.isArray(blocks)
+                ? blocks
+                    .filter((b: any) => b.type === "sidebar")
+                    .map((b: Block, i: number) => (
                   <>
                     <BlockRenderer key={`sidebar-${i}`} block={b} />
                     {/* {slug === "dialogseries" ? ( */}
@@ -296,24 +301,32 @@ export default function AcademyPage() {
                       </div>
                     {/* // ) : null} */}
                   </>
-                ))}
+                ))
+              : []
+            }
             </div>
 
             {/* Main content column */}
             <div className="md:col-span-3">
-              {data.blocks
-                .filter((b: any) => b.type === "listToolbar")
-                .map((b: Block, i: number) => (
-                  <BlockRenderer key={`toolbar-${i}`} block={b} />
-                ))}
+              {Array.isArray(blocks)
+                ? blocks
+                    .filter((b: any) => b.type === "listToolbar")
+                    .map((b: Block, i: number) => (
+                      <BlockRenderer key={`toolbar-${i}`} block={b} />
+                    ))
+                : []
+              }
 
-              {data.blocks
-                .filter(
-                  (b: any) => b.type === "richText" || b.type === "cardGrid"
-                )
-                .map((b: Block, i: number) => (
-                  <BlockRenderer key={`main-${i}`} block={b} />
-                ))}
+              {Array.isArray(blocks)
+                ? blocks
+                    .filter(
+                      (b: any) => b.type === "richText" || b.type === "cardGrid"
+                    )
+                    .map((b: Block, i: number) => (
+                      <BlockRenderer key={`main-${i}`} block={b} />
+                    ))
+                : []
+              }
             </div>
           </div>
         </div>
