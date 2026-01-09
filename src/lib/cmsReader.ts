@@ -80,7 +80,6 @@ async function tryMultipleEndpoints(endpoints: string[]): Promise<Response | nul
   return null;
 }
 
-
 /**
  * Fetches content from the deployed CMS
  */
@@ -205,42 +204,6 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
       };
     }
   } catch (error) {
-    console.error(`Error fetching specific content for section '${section}' and slug '${slug}' from CMS:`, error);
-
-    return {
-      success: false,
-      status: 500,
-      message: 'Error occurred while fetching content',
-      data: {
-        id: `${section}-${slug}`,
-        section: section as any,
-        slug: slug,
-        title: `${section} - ${slug}`,
-        blocks: [],
-        version: 1,
-        updatedAt: new Date().toISOString()
-      }
-    };
-  }
-} catch (error) {
-    console.error(`Error fetching specific content for section '${section}' and slug '${slug}' from CMS:`, error);
-
-    return {
-      success: false,
-      status: 500,
-      message: 'Error occurred while fetching content',
-      data: {
-        id: `${section}-${slug}`,
-        section: section as any,
-        slug: slug,
-        title: `${section} - ${slug}`,
-        blocks: [],
-        version: 1,
-        updatedAt: new Date().toISOString()
-      }
-    };
-  }
-} catch (error) {
     console.error(`Error fetching CMS content for section '${section}' from ${CMS_BASE_URL}:`, error);
 
     // Return fallback data based on section
