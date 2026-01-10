@@ -4,6 +4,11 @@ const CMS_BASE_URL = typeof window !== 'undefined' && process.env.NODE_ENV !== '
   ? '/api/content' // Local API route that proxies to the CMS in development
   : 'https://ssc-cms.vercel.app/api/content'; // Deployed CMS in production - note the /api/content path
 
+// Debug: Log the CMS_BASE_URL being used
+if (typeof window !== 'undefined') {
+  console.log('CMS_BASE_URL configured as:', CMS_BASE_URL, 'in environment:', process.env.NODE_ENV);
+}
+
 // Import for path operations
 import path from 'path';
 
