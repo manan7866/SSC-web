@@ -316,13 +316,18 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
  */
 export async function readSpecificCmsContent(section: string, slug: string): Promise<any> {
   try {
-    // Since we're using a proxy, construct the endpoint directly
-    const endpoint = `${CMS_BASE_URL}/${section}/${slug}`;
+    // Try multiple possible paths for specific content in order of preference
+    // The content is typically stored as: content/prod/{section}/{slug}/v1.json
+    const endpointsToTry = [
+      `${CMS_BASE_URL}/${section}/${slug}/v1.json`,  // Primary: with version number and .json extension
+      `${CMS_BASE_URL}/${section}/${slug}`,          // Fallback: without version/extension
+      `${CMS_BASE_URL}/${section}/${slug}/v1`       // Alternative: with version but no extension
+    ];
 
-    console.log(`Attempting to fetch specific content from CMS proxy: ${section}/${slug}, endpoint: ${endpoint}`);
+    console.log(`Attempting to fetch specific content from CMS proxy: ${section}/${slug}, trying endpoints:`, endpointsToTry);
 
-    // Try the single endpoint (which will be proxied to the actual CMS)
-    let response = await tryMultipleEndpoints([endpoint]);
+    // Try multiple endpoints (which will be proxied to the actual CMS)
+    let response = await tryMultipleEndpoints(endpointsToTry);
 
     if (response) {
       console.log(`Successfully fetched specific content from deployed CMS: ${response.url}`);
