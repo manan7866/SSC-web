@@ -86,7 +86,13 @@ async function tryMultipleEndpoints(endpoints: string[]): Promise<Response | nul
 export async function readCmsContent(section: string): Promise<CmsContent> {
   try {
     // Since we're using a proxy, construct the endpoint directly
-    const endpoint = `${CMS_BASE_URL}/${section}`;
+    // For explorer and academy sections, content is stored in the index directory
+    let endpoint;
+    if (section === 'explorer' || section === 'academy') {
+      endpoint = `${CMS_BASE_URL}/index/${section}`;
+    } else {
+      endpoint = `${CMS_BASE_URL}/${section}`;
+    }
 
     console.log(`Attempting to fetch content from CMS proxy for section: ${section}, endpoint: ${endpoint}`);
 
