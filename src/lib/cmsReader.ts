@@ -100,12 +100,33 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
         console.log(`Received data from CMS:`, data);
 
         // Format the response to match the expected API format
+        // The CMS API wraps file content in data.data.items structure
+        let items = [];
+        if (Array.isArray(data)) {
+          // If data is directly an array (edge case)
+          items = data;
+        } else if (data && typeof data === 'object') {
+          // Check if it's the wrapped format from CMS API: { data: { items: [...] } }
+          if (data.data && Array.isArray(data.data.items)) {
+            items = data.data.items;
+          } else if (data.data && data.data.items) {
+            // If data.data.items exists but is not an array, check if it's an object with items
+            items = Array.isArray(data.data.items) ? data.data.items : (data.data.items || []);
+          } else if (Array.isArray(data.items)) {
+            // If it's the unwrapped format: { items: [...] }
+            items = data.items;
+          } else {
+            // Fallback to empty array
+            items = [];
+          }
+        }
+
         return {
           success: true,
           status: 200,
           message: 'Successfully loaded from deployed CMS',
           data: {
-            items: Array.isArray(data) ? data : (data.items || [])
+            items: items
           }
         };
       } catch (parseError) {
@@ -269,6 +290,13 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
         const data = await response.json();
         console.log(`Received specific content data from CMS:`, data);
 
+        // Handle the CMS API response format where file content is wrapped in data.data
+        let contentData = data;
+        if (data && typeof data === 'object' && data.data) {
+          // If it's the wrapped format from CMS API: { data: { ...actualContent } }
+          contentData = data.data;
+        }
+
         // Return the actual content data with proper structure for individual pages
         return {
           success: true,
@@ -278,16 +306,16 @@ export async function readSpecificCmsContent(section: string, slug: string): Pro
             id: `${section}-${slug}`,
             section: section as any,
             slug: slug,
-            title: data.title || `${section} - ${slug}`,
-            blocks: Array.isArray(data.blocks) ? data.blocks : (Array.isArray(data.items) ? data.items : []),
-            version: data.version || 1,
-            updatedAt: data.updatedAt || new Date().toISOString(),
-            ...(data.subtitle && { subtitle: data.subtitle }),
-            ...(data.parentPage && { parentPage: data.parentPage }),
-            ...(data.cardTitle && { cardTitle: data.cardTitle }),
-            ...(data.heroImage && { heroImage: data.heroImage }),
-            ...(data.category && { category: data.category }),
-            ...(data.seo && { seo: data.seo })
+            title: contentData.title || `${section} - ${slug}`,
+            blocks: Array.isArray(contentData.blocks) ? contentData.blocks : (Array.isArray(contentData.items) ? contentData.items : []),
+            version: contentData.version || 1,
+            updatedAt: contentData.updatedAt || new Date().toISOString(),
+            ...(contentData.subtitle && { subtitle: contentData.subtitle }),
+            ...(contentData.parentPage && { parentPage: contentData.parentPage }),
+            ...(contentData.cardTitle && { cardTitle: contentData.cardTitle }),
+            ...(contentData.heroImage && { heroImage: contentData.heroImage }),
+            ...(contentData.category && { category: contentData.category }),
+            ...(contentData.seo && { seo: contentData.seo })
           }
         };
       } catch (parseError) {
