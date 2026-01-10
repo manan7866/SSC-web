@@ -109,28 +109,46 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
         const data = await response.json();
         console.log(`Received data from CMS:`, data);
 
+        // Debug: Log the structure of the response
+        console.log(`Response structure - Type: ${typeof data}, IsArray: ${Array.isArray(data)}, HasDataProp: ${!!data.data}, HasItemsProp: ${!!(data.items || (data.data && data.data.items))}`);
+
         // Format the response to match the expected API format
         // The CMS API wraps file content in data.data.items structure
         let items = [];
         if (Array.isArray(data)) {
           // If data is directly an array (edge case)
+          console.log(`Direct array response with ${data.length} items`);
           items = data;
         } else if (data && typeof data === 'object') {
           // Check if it's the wrapped format from CMS API: { data: { items: [...] } }
           if (data.data && Array.isArray(data.data.items)) {
+            console.log(`Wrapped format found: data.data.items with ${data.data.items.length} items`);
             items = data.data.items;
-          } else if (data.data && data.data.items) {
-            // If data.data.items exists but is not an array, check if it's an object with items
-            items = Array.isArray(data.data.items) ? data.data.items : (data.data.items || []);
+          } else if (data.data && typeof data.data === 'object' && Array.isArray(data.data.items)) {
+            // Double check the nested format
+            console.log(`Nested format found: data.data.items with ${data.data.items.length} items`);
+            items = data.data.items;
           } else if (Array.isArray(data.items)) {
             // If it's the unwrapped format: { items: [...] }
+            console.log(`Unwrapped format found: data.items with ${data.items.length} items`);
             items = data.items;
+          } else if (data.files && Array.isArray(data.files)) {
+            // If it's a directory listing response
+            console.log(`Directory listing found: ${data.files.length} files`);
+            // Convert directory listing to items format if needed
+            items = data.files.map((file: string) => ({
+              slug: file.replace('.json', ''),
+              title: file.replace('.json', '').replace(/-/g, ' '),
+              path: `prod/${section}/${file}`
+            }));
           } else {
             // Fallback to empty array
+            console.log(`No items found in response structure`, data);
             items = [];
           }
         }
 
+        console.log(`Final items array length: ${items.length}`);
         return {
           success: true,
           status: 200,
