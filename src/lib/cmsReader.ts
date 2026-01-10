@@ -89,13 +89,20 @@ export async function readCmsContent(section: string): Promise<CmsContent> {
     // Try multiple possible paths for explorer and academy sections
     let endpointsToTry = [];
     if (section === 'explorer' || section === 'academy') {
-      // Try both the index path and direct path for explorer/academy
+      // Try multiple paths for explorer/academy sections in order of preference:
+      // 1. Index directory with json extension (most likely)
+      // 2. Index directory without extension
+      // 3. Direct path without extension
       endpointsToTry = [
-        `${CMS_BASE_URL}/index/${section}`,  // Primary: content from index directory
-        `${CMS_BASE_URL}/${section}`         // Fallback: direct content path
+        `${CMS_BASE_URL}/index/${section}.json`,  // Primary: content from index directory with .json
+        `${CMS_BASE_URL}/index/${section}`,       // Secondary: content from index directory
+        `${CMS_BASE_URL}/${section}`              // Fallback: direct content path
       ];
     } else {
-      endpointsToTry = [`${CMS_BASE_URL}/${section}`];
+      endpointsToTry = [
+        `${CMS_BASE_URL}/${section}.json`,  // Try with .json extension first
+        `${CMS_BASE_URL}/${section}`        // Fallback without extension
+      ];
     }
 
     console.log(`Attempting to fetch content from CMS for section: ${section}, trying endpoints:`, endpointsToTry);
