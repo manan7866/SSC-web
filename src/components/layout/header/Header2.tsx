@@ -175,39 +175,41 @@ const Header2: React.FC<Header2Props> = ({
         {/* Main Header */}
         <nav className="bg-fixnix-white z-[1200]">
           <div className="relative z-10">
-            <div className="flex flex-wrap items-center justify-between p-4">
-              <div className="flex items-center gap-3">
-                <Link href="/">
-                  <Image
-                    src="/assets/images/resources/logo-3.png"
-                    alt="Sufi Science Center Logo"
-                    width={110}
-                    height={110}
-                    className="responsive-logo w-[40px] sm:w-[50px] md:w-[70px] lg:w-[90px] xl:w-[110px] 2xl:w-[130px] 3xl:w-[150px] h-auto max-w-full transition-all duration-300 ease-in-out"
-                  />
-                </Link>
-                <div className="flex flex-col">
-                  <span
-                    className="text-fixnix-darkpurple leading-tight font-serif whitespace-nowrap text-[0.9rem] sm:text-[1rem] md:text-[1.1rem] lg:text-[1.3rem] xl:text-[1.5rem] 2xl:text-[1.7rem] 3xl:text-[2rem] font-bold transition-all duration-300 ease-in-out"
-                  >
-                    Sufi Science Center
-                  </span>
-                  <p
-                    className="italic text-gray-600 text-[0.5rem] sm:text-[0.55rem] md:text-[0.6rem] lg:text-[0.7rem] xl:text-[0.8rem] 2xl:text-[0.9rem] 3xl:text-[1rem] mt-0.5 transition-all duration-300 ease-in-out max-w-xs sm:max-w-sm"
-                  >
-                    A Harmony of Knowledge and Inner Peace: The Next Generation Sufi
-                    Way Forward
-                  </p>
+            <div className="flex flex-col items-start p-4">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center gap-3">
+                  <Link href="/">
+                    <Image
+                      src="/assets/images/resources/logo-3.png"
+                      alt="Sufi Science Center Logo"
+                      width={110}
+                      height={110}
+                      className="responsive-logo w-[40px] sm:w-[50px] md:w-[70px] lg:w-[90px] xl:w-[110px] 2xl:w-[130px] 3xl:w-[150px] h-auto max-w-full transition-all duration-300 ease-in-out"
+                    />
+                  </Link>
+                  <div className="flex flex-col">
+                    <span
+                      className="text-fixnix-darkpurple leading-tight font-serif whitespace-nowrap text-[0.9rem] sm:text-[1rem] md:text-[1.1rem] lg:text-[1.3rem] xl:text-[1.5rem] 2xl:text-[1.7rem] 3xl:text-[2rem] font-bold transition-all duration-300 ease-in-out"
+                    >
+                      Sufi Science Center
+                    </span>
+                    <p
+                      className="italic text-gray-600 text-[0.5rem] sm:text-[0.55rem] md:text-[0.6rem] lg:text-[0.7rem] xl:text-[0.8rem] 2xl:text-[0.9rem] 3xl:text-[1rem] mt-0.5 transition-all duration-300 ease-in-out max-w-xs sm:max-w-sm"
+                    >
+                      A Harmony of Knowledge and Inner Peace: The Next Generation Sufi
+                      Way Forward
+                    </p>
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center">
+                  <Link href="/membership" className="membership-btn">
+                    Get Membership
+                  </Link>
                 </div>
               </div>
-              <div className="hidden md:flex items-center">
-                <Link href="/membership" className="membership-btn">
-                  Get Membership
-                </Link>
-              </div>
 
-              {/* Mobile and Desktop Navigation */}
-              <div className="flex items-center gap-4">
+              {/* Mobile and Desktop Navigation - On a separate row */}
+              <div className="flex items-center gap-4 mt-2 w-full pl-12 justify-start">
                 <div className="flex items-center mt-4 -mb-2">
                   <Link
                     href="#"

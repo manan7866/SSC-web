@@ -270,11 +270,10 @@ ul {
   top: -50%;
 }
 
-/* Hide on medium (md) and small (sm) screens */
-@media (max-width: 992px) {
-  /* Bootstrap md and below */
+/* Show on all medium and larger screens */
+@media (min-width: 768px) {
   .membership-btn {
-    display: none;
+    display: inline-block;
   }
 }
 
