@@ -76,15 +76,15 @@ export default function Home() {
             "Expires": "0"
           }
         });
-        
+
         if (!res.ok) {
           throw new Error(`API request failed: ${res.status}`);
         }
-        
+
         const response = await res.json();
         // API returns: { code: 200, message: "ok", data: { collection, count, fields, data } }
         const payload = response.data;
-        
+
         const items = Array.isArray(payload?.data)
           ? (payload.data as any[]).map((d) => ({
               id: d.id || 0,
@@ -124,12 +124,20 @@ export default function Home() {
     loadData();
   }, []);
 
+  // Update search as user types - search by first letter or full name
+  useEffect(() => {
+    setSearch(query);
+  }, [query]);
+
   const filtered = useMemo(() => {
     return saints.filter((s) => {
       const matchesSearch = search
         ? (s.name || "")
             .toLowerCase()
-            .includes(search.toLowerCase())
+            .startsWith(search.toLowerCase()) || // Match first letter initially
+          (s.name || "")
+            .toLowerCase()
+            .includes(search.toLowerCase()) // Then include partial matches
         : true;
       const matchesCentury = century ? s.century === century : true;
       return matchesSearch && matchesCentury;
