@@ -67,7 +67,7 @@ export default function Home() {
     const loadData = async () => {
       try {
         // Fetch from backend API
-        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+        const apiUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8001";
         const res = await fetch(`${apiUrl}/sufi-saints`, {
           cache: "no-store",
           headers: {
@@ -115,7 +115,7 @@ export default function Home() {
               }))
             : [];
           setSaints(items);
-          console.log("Loaded saints data from local JSON fallback");
+          // console.log("Loaded saints data from local JSON fallback");
         } catch (fallbackError) {
           console.error("Failed to load saints data from fallback", fallbackError);
         }

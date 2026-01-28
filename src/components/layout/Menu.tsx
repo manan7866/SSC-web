@@ -35,10 +35,10 @@ export default function Menu() {
   const safeAcademyRoutes = (!loading && academyRoutes.length === 0) ? PREDEFINED_ACADEMY_ROUTES : academyRoutes;
 
   // Debug logging
-  console.log("Menu component - explorerRoutes length:", safeExplorerRoutes?.length || 0);
-  console.log("Menu component - academyRoutes length:", safeAcademyRoutes?.length || 0);
-  console.log("Menu component - loading state:", loading);
-  console.log("Menu component - error state:", error);
+  // console.log("Menu component - explorerRoutes length:", safeExplorerRoutes?.length || 0);
+  // console.log("Menu component - academyRoutes length:", safeAcademyRoutes?.length || 0);
+  // console.log("Menu component - loading state:", loading);
+  // console.log("Menu component - error state:", error);
   
   return (
     <>

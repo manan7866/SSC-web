@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     let content;
     if (slug) {
       // Fetch specific content with timeout
-      console.log(`Attempting to fetch specific content from deployed backend: ${section}/${slug}`);
+      // console.log(`Attempting to fetch specific content from deployed backend: ${section}/${slug}`);
       const contentPromise = axios.get(`${backendUrl}/content/${section}/${slug}`, {
         timeout: 5000, // 5 second timeout
         headers: {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       content = response.data;
     } else {
       // Fetch content list for section with timeout
-      console.log(`Attempting to fetch content list from backend: ${section}`);
+      // console.log(`Attempting to fetch content list from backend: ${section}`);
       const contentPromise = axios.get(`${backendUrl}/content/${section}`, {
         timeout: 5000, // 5 second timeout
         headers: {
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
       content = response.data;
     }
 
-    console.log('Content fetch successful from backend:', content.status || 'OK');
+    // console.log('Content fetch successful from backend:', content.status || 'OK');
 
     // Return the data from the backend
     return new Response(JSON.stringify(content), {

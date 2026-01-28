@@ -440,6 +440,110 @@ export default function Home() {
         </section>
 
         {/*Why Choose One End*/}
+
+        {/*Collaborator Application Start*/}
+        <section className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center px-4 py-12">
+          <div className="w-full max-w-3xl bg-white shadow-lg rounded-2xl p-8 space-y-6">
+            <div className="text-center space-y-2">
+              <h1 className="text-3xl font-bold text-fixnix-lightpurple">
+                Join the Sufi Science Center as Collaborator
+              </h1>
+              <p className="text-gray-600 text-sm">
+                A soulful movement rooted in spirituality, wisdom, and community
+                healing.
+              </p>
+            </div>
+
+            <form id="collaboratorForm" className="space-y-6">
+              {/* Personal Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Phone *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Phone number"
+                    className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Country *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+                  />
+                </div>
+              </div>
+
+              {/* Collaborator Intent */}
+              <div className="space-y-4 text-gray-700 border-t pt-6">
+                <h3 className="text-lg font-semibold">Collaborator Intent</h3>
+                {[
+                  "institutional",
+                  "cultural",
+                  "interfaithDialogue",
+                  "programCorrelation",
+                ].map((type) => (
+                  <label key={type} className="flex items-center space-x-2">
+                    <input type="checkbox" value={type} className="w-4 h-4" />
+                    <span className="capitalize">{type.replace(/([A-Z])/g, " $1")}</span>
+                  </label>
+                ))}
+                <input
+                  type="text"
+                  placeholder="Organization (if applicable)"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+                />
+                <input
+                  type="text"
+                  placeholder="What do you hope to co-create?"
+                  className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+                />
+              </div>
+
+              {/* Additional Notes */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Anything else you'd like to share?
+                </label>
+                <textarea
+                  className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+                  rows={4}
+                ></textarea>
+              </div>
+
+              {/* Consent */}
+              <div className="space-y-2">
+                <label className="flex items-center space-x-2 text-gray-700">
+                  <input type="checkbox" className="w-4 h-4" required />
+                  <span>I agree to the principles of the Sufi Science Center</span>
+                </label>
+                <label className="flex items-center space-x-2 text-gray-700">
+                  <input type="checkbox" className="w-4 h-4" />
+                  <span>I consent to receiving updates</span>
+                </label>
+              </div>
+
+              {/* Buttons */}
+              <div className="pt-4 space-y-3">
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-fixnix-lightpurple hover:bg-fixnix-darkpurple text-white font-semibold rounded-xl transition"
+                >
+                  Apply as Collaborator
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        {/*Collaborator Application End*/}
+
       </Layout>
     </>
   );

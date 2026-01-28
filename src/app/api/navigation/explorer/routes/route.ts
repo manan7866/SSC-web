@@ -9,7 +9,7 @@ function timeout(ms: number) {
 export async function GET(request: NextRequest) {
   try {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ssc-backend-production-3b8f.up.railway.app/v1';
-    console.log('Attempting to fetch explorer routes from deployed backend at:', backendUrl);
+    // console.log('Attempting to fetch explorer routes from deployed backend at:', backendUrl);
 
     // Fetch content from backend with timeout to prevent hanging requests
     const contentPromise = axios.get(`${backendUrl}/content/explorer`, {
@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     const response = await Promise.race([contentPromise, timeoutPromise]) as any;
     const content = response.data;
 
-    console.log('Explorer routes fetch successful from backend:', content.status || 'OK');
-    console.log('Explorer routes data length:', content.data?.items?.length || 0);
+    // console.log('Explorer routes fetch successful from backend:', content.status || 'OK');
+    // console.log('Explorer routes data length:', content.data?.items?.length || 0);
 
     // Return the data from the backend
     return new Response(JSON.stringify(content), {
@@ -70,7 +70,7 @@ export async function GET(request: NextRequest) {
       }
     };
 
-    console.log('Returning fallback data for explorer routes:', fallbackData.data.items.length);
+    // console.log('Returning fallback data for explorer routes:', fallbackData.data.items.length);
 
     return new Response(JSON.stringify(fallbackData), {
       status: 200,

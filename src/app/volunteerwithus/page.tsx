@@ -251,6 +251,122 @@ export default function Home() {
           </div>
         </section>
 
+
+        <section className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 flex items-center justify-center px-4 py-12">
+  <div className="w-full max-w-3xl bg-white shadow-lg rounded-2xl p-8 space-y-6">
+    <div className="text-center space-y-2">
+      <h1 className="text-3xl font-bold text-fixnix-lightpurple">
+        Join the Sufi Science Center as Volunteer
+      </h1>
+      <p className="text-gray-600 text-sm">
+        A soulful movement rooted in spirituality, wisdom, and community
+        healing.
+      </p>
+    </div>
+
+    <form id="volunteerForm" className="space-y-6">
+      {/* Personal Info */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-semibold text-gray-700">
+            Phone *
+          </label>
+          <input
+            type="text"
+            placeholder="Phone number"
+            className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold text-gray-700">
+            Country *
+          </label>
+          <input
+            type="text"
+            placeholder="Country"
+            className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+          />
+        </div>
+      </div>
+
+      {/* Volunteer Details */}
+      <div className="space-y-4 text-gray-700 border-t pt-6">
+        <h3 className="text-lg font-semibold">Volunteer Details</h3>
+        <label className="block text-sm font-semibold">Areas of Support:</label>
+        <div className="flex flex-wrap gap-4">
+          {[
+            "spiritualProgram",
+            "communityOutreach",
+            "culturalPreservation",
+            "digitalMedia",
+            "craftsmanship",
+          ].map((item) => (
+            <label key={item} className="flex items-center space-x-2">
+              <input type="checkbox" value={item} className="w-4 h-4" />
+              <span className="capitalize">
+                {item.replace(/([A-Z])/g, " $1")}
+              </span>
+            </label>
+          ))}
+        </div>
+        <input
+          type="text"
+          placeholder="Previous volunteering experience"
+          className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+        />
+        <input
+          type="text"
+          placeholder="Time you can offer monthly"
+          className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+        />
+        <label className="block text-sm font-semibold">Preferred mode:</label>
+        <div className="flex gap-4">
+          {["IN_PERSON", "REMOTE", "HYBRID"].map((mode) => (
+            <label key={mode} className="flex items-center space-x-2">
+              <input type="radio" value={mode} className="w-4 h-4" />
+              <span className="capitalize">{mode.replace("_", "-")}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Additional Notes */}
+      <div>
+        <label className="block text-sm font-semibold text-gray-700">
+          Anything else you'd like to share?
+        </label>
+        <textarea
+          className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
+          rows={4}
+        ></textarea>
+      </div>
+
+      {/* Consent */}
+      <div className="space-y-2">
+        <label className="flex items-center space-x-2 text-gray-700">
+          <input type="checkbox" className="w-4 h-4" required />
+          <span>I agree to the principles of the Sufi Science Center</span>
+        </label>
+        <label className="flex items-center space-x-2 text-gray-700">
+          <input type="checkbox" className="w-4 h-4" />
+          <span>I consent to receiving updates</span>
+        </label>
+      </div>
+
+      {/* Buttons */}
+      <div className="pt-4 space-y-3">
+        <button
+          type="submit"
+          className="w-full py-3 bg-fixnix-lightpurple hover:bg-fixnix-darkpurple text-white font-semibold rounded-xl transition"
+        >
+          Apply as Volunteer
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+
         {/*Contact Two Start*/}
         <section className="relative bg-[var(--fixnix-lightpuple)] py-24 text-left-mobile">
           <div className="absolute inset-0 bg-no-repeat bg-center bg-cover mix-blend-multiply"></div>
@@ -332,7 +448,12 @@ export default function Home() {
 
         {/*Contact Two  End*/}
 
-        {/*Contact Page Two Start*/}
+        {/*Volunteer Application Start*/}
+        
+
+        {/*Volunteer Application End*/}
+
+        {/*Contact Page Two Start - Existing Booking Form Section */}
         <section className=" text-left-mobile py-20 sm:py-24 md:py-28">
   <div className="container mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex flex-col lg:flex-row lg:space-x-28">
@@ -454,7 +575,6 @@ export default function Home() {
     </div>
   </div>
 </section>
-
 
         {/*Contact Page Two End*/}
       </Layout>
