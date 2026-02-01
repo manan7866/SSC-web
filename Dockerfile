@@ -70,7 +70,7 @@ EXPOSE 6020
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --quiet --tries=1 --spider http://localhost:6020 || exit 1
+ CMD wget --quiet --tries=1 --spider http://localhost:6020 || exit 1
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
