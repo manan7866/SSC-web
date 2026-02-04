@@ -2,7 +2,7 @@
 export const config = {
   // API Base URL - Change this to match your backend URL
   API_BASE_URL:
-  process.env.NEXT_PUBLIC_API_URL || "https://ssc-backend-production-3b8f.up.railway.app/v1",
+  process.env.NEXT_PUBLIC_API_URL || "https://api.sufisciencecenter.info/v1",
   // "http://localhost:6015/v1",
 
   // Google OAuth Client ID
@@ -12,7 +12,7 @@ export const config = {
   NODE_ENV: process.env.NODE_ENV || "development",
 
   // App URLs
-  APP_URL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:6020",
+  APP_URL: process.env.NEXT_PUBLIC_APP_URL || "https://sufisciencecenter.info",
 
   //stripe
   STRIPE_PUBLIC_KEY:
