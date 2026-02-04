@@ -38,10 +38,10 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL ||
-      "https://ssc-backend-production-3b8f.up.railway.app/v1",
+      "https://api.sufisciencecenter.info/v1",
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL ||
-      "https://ssc-backend-production-3b8f.up.railway.app/v1",
+      "https://api.sufisciencecenter.info/v1",
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "",
@@ -138,7 +138,7 @@ const nextConfig = {
   async rewrites() {
     const backendUrl =
       process.env.NEXT_PUBLIC_BACKEND_URL ||
-      "https://ssc-backend-production-3b8f.up.railway.app/v1";
+      "https://api.sufisciencecenter.info/v1";
 
     // Only proxy API requests in development mode
     if (process.env.NODE_ENV !== 'production') {
