@@ -8,7 +8,7 @@ function timeout(ms: number) {
 
 export async function GET(request: NextRequest) {
   try {
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ssc-backend-production-3b8f.up.railway.app/v1';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.sufisciencecenter.info/v1';
     // console.log('Attempting to fetch explorer routes from deployed backend at:', backendUrl);
 
     // Fetch content from backend with timeout to prevent hanging requests
