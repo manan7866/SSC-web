@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://ssc-backend-production-3b8f.up.railway.app/v1';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.sufisciencecenter.info/v1';
 
     let content;
     if (slug) {
