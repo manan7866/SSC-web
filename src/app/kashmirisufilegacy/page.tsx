@@ -51,6 +51,7 @@ type Saint = {
   id: number;
   name: string;
   dates_raw: string | null;
+  region: string;
   period: string;
   century: string;
   summary: string;
@@ -62,6 +63,8 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
   const [century, setCentury] = useState<string>("");
+  const [period , setPeriod] = useState<string>("");
+  const [region , setRegion] = useState<string>("");
 
   useEffect(() => {
     const loadData = async () => {
@@ -91,6 +94,7 @@ export default function Home() {
               name: d.name ?? "",
               dates_raw: d.dates_raw ?? null,
               period: d.period ?? "",
+              region: d.region ?? "",
               century: d.century ?? "",
               summary: d.summary ?? "",
               tags: Array.isArray(d.tags) ? d.tags : []
@@ -109,6 +113,7 @@ export default function Home() {
                 name: d.name ?? "",
                 dates_raw: d.dates_raw ?? null,
                 period: d.period ?? "",
+                region: d.region ?? "",
                 century: d.century ?? "",
                 summary: d.summary ?? "",
                 tags: Array.isArray(d.tags) ? d.tags : []
@@ -132,6 +137,7 @@ export default function Home() {
   const filtered = useMemo(() => {
     return saints.filter((s) => {
       const matchesSearch = search
+          
         ? (s.name || "")
             .toLowerCase()
             .startsWith(search.toLowerCase()) || // Match first letter initially
@@ -140,15 +146,17 @@ export default function Home() {
             .includes(search.toLowerCase()) // Then include partial matches
         : true;
       const matchesCentury = century ? s.century === century : true;
-      return matchesSearch && matchesCentury;
+      const matchesPeriod = period ? s.period === period : true;
+      const matchesRegion = region ? s.region === region : true;
+      return matchesSearch && matchesCentury && matchesPeriod && matchesRegion;
     });
-  }, [saints, search, century]);
+  }, [saints, search, century, period, region]);
 
   // Show only 3 by default; when searching or filtering by century, show all matching
   const displayed = useMemo(() => {
-    const isDefaultView = !search && !century;
+    const isDefaultView = !search && !century && !period && !region;
     return isDefaultView ? filtered.slice(0, 3) : filtered;
-  }, [filtered, search, century]);
+  }, [filtered, search, century , period, region]);
   return (
     <>
       <Layout
@@ -215,15 +223,16 @@ export default function Home() {
                         </div>
                       </section>
                       <div className="bg-gray-100 text-gray-800 py-20 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-5xl mx-auto">
-                  <h1 className="text-3xl sm:text-4xl font-bold text-center mt-8">
+                <div className="max-w-5xl mx-auto ">
+                  {/* <h1 className="text-3xl sm:text-4xl font-bold text-center mt-8">
                   Kashmir's Sufi Legacy: A Journey Across Centuries
                   </h1>
                   <h1 className="text-xl sm:text-4xl font-semibold text-center mt-1 mb-4">
                   Discover. Search. Experience.
-                  </h1>
+                  </h1> */}
 
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between md:gap-2 mb-8">
+                  <div className="flex  flex-col px-8 py-12 rounded-xl bg-gray-50/100 backdrop-blur-xl  md:items-center md:justify-between md:gap-2 mb-8">
+                    <div className="flex w-full md:gap-2">
                     <input
                       type="text"
                       placeholder="Search saints..."
@@ -231,13 +240,14 @@ export default function Home() {
                       onChange={(e) => setQuery(e.target.value)}
                       className="w-full md:w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none"
                     />
+                    <div className="flex rounded-md w-max ">
                     <button
                       onClick={() => setSearch(query)}
-                      className="w-full md:w-auto px-4 py-2 bg-fixnix-lightpurple text-white rounded-lg hover:opacity-90 md:ml-2"
+                      className="w-full md:w-auto px-4 py-2 bg-fixnix-lightpurple rounded-l-md text-white  hover:opacity-90 "
                     >
                       Search
                     </button>
-                    <select
+                    {/* <select
                       value={century}
                       onChange={(e) => setCentury(e.target.value)}
                       className="w-full md:w-1/4 px-4 py-2 border rounded-lg shadow-sm md:mx-2"
@@ -251,24 +261,77 @@ export default function Home() {
                       <option value="19th Century">19th Century</option>
                       <option value="20th Century">20th Century</option>
                       <option value="21st Century">21st Century</option>
-                    </select>
+                    </select> */}
                     <button
                       onClick={() => {
                         setSearch("");
                         setQuery("");
                         setCentury("");
+                        setPeriod("");
+                        setRegion("");
                       }}
-                      className="w-full md:w-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 md:ml-2"
+                      className="w-full md:w-auto px-4 py-2  text-fixnix-lightpurple rounded-r-md hover:opacity-90 border-[1px] border-fixnix-lightpurple "
                     >
                       Reset
                     </button>
+                    </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mt-2 grid-rows-1 w-full">
+                      <div className="text-xl  text-fixnix-lightpurple">
+                        <p className="mb-1">Period</p>
+                        <select
+                      value={period}
+                      onChange={(e) => setPeriod(e.target.value)}
+                      className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2"
+                    >
+                    <option value=""> All Period</option>
+                      <option value="Cross-Cultural Synthesis">Cross-Cultural Synthesis</option>
+                      <option value="Institutional Consolidation">Institutional Consolidation</option>
+                      <option value="Intellectual Refinement">Intellectual Refinement</option>
+                      <option value="Period of Reform and Integration">Period of Reform and Integration</option>
+                      <option value="Poetic Efflorescence">Poetic Efflorescence</option>
+                      <option value="The Formative Period">The Formative Period</option>
+
+                      
+                    </select>
+
+                      </div>
+                      <div className="text-xl  text-fixnix-lightpurple">
+                        <p className="mb-1">Century</p>
+                        <select
+                      value={century}
+                      onChange={(e) => setCentury(e.target.value)}
+                      className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2"
+                    >
+                      <option value="">All Century</option>
+                      <option value="14th Century">14th Century</option>
+                      <option value="15th Century">15th Century</option>
+                      <option value="16th Century">16th Century</option>
+                      <option value="17th Century">17th Century</option>
+                      <option value="18th Century">18th Century</option>
+                      <option value="19th Century">19th Century</option>
+                      <option value="20th Century">20th Century</option>
+                      <option value="21st Century">21st Century</option>
+                    </select>
+                      </div>
+                      <div className="text-xl text-fixnix-lightpurple">
+                        <p className="mb-1">Region</p>
+                        <select onChange={(e) => setRegion(e.target.value)} value={region} className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2">
+                      <option value="">All Region</option>
+                      <option value="south kashmir">South Kashmir</option>
+                      <option value="North Kashmir">North Kashmir</option>
+                      <option value="Central Kashmir">Central Kashmir</option>
+                        </select>
+                      </div>
+                    </div>
+                    
                   </div>
 
 
                   {/* Cards */}
                   <div className="space-y-6">
                     {displayed.map((s) => (
-                      <div key={s.id} className="bg-white rounded-lg shadow-md p-6">
+                      <div key={s.id} className=" rounded-xl bg-gray-50/100 backdrop-blur-xl shadow-md p-6">
                         <h2 className="text-xl font-semibold">{s.name}</h2>
                         <p className="text-sm text-gray-600 mb-2">{s.dates_raw ?? ""} | {s.period}</p>
                         <p className="mb-4">{s.summary}</p>
