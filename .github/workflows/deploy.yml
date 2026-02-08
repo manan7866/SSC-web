@@ -1,9 +1,9 @@
-name: Deploying frontend using npm,pm2 and nginx
+name: Frontend Deployment 
 
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   deploy:
@@ -13,12 +13,21 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          node-version: 22
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Build & Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/sscfrontend:latest
+      
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -28,17 +37,7 @@ jobs:
           port: ${{ secrets.PORT }}
           script: |
             cd ${{ secrets.APP_PATH }}
-
-            echo "Pulling latest changes..."
-            git pull origin main
-
-            echo "Installing dependencies using npm..."
-            npm install
-
-            echo "Building project with npm..."
-            npm run build
-
-            echo "Restarting PM2 service..."
-            pm2 restart sufism-frontend --update-env
-
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/sscfrontend:latest
+            docker compose down frontend
+            docker compose up -d frontend
             echo "✅ Deployment complete and changes reflected!"
