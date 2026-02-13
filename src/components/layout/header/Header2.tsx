@@ -7,6 +7,7 @@ import MobileMenu from "../MobileMenu";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Header2Props {
   scroll: number;
@@ -87,15 +88,42 @@ const Header2: React.FC<Header2Props> = ({
               SSC | Kashmir Chapter
             </p>
             <div className="flex items-center space-x-2 sm:space-x-4">
-              {isAuthenticated && (
-                <Link href={"/myprofile"}>
-                  <button
-                    onClick={handleProfileClick}
-                    className="flex items-center justify-center h-9 w-9 bg-fixnix-white text-fixnix-darkpurple rounded-full text-md transition-all duration-300 hover:bg-fixnix-lightpurple hover:text-fixnix-white"
-                  >
-                    <i className="fas fa-user"></i>
-                  </button>
-                </Link>
+              {isAuthenticated && user && (
+                <div className="relative group">
+                  <Link href={"/myprofile"}>
+                    <div className="flex items-center gap-2 cursor-pointer">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage 
+                          src={user.avatar || undefined} 
+                          alt={`${user.fullName}'s avatar`}
+                          onError={(e) => {
+                            // Fallback to default avatar if image fails to load
+                            (e.target as HTMLImageElement).src = "https://via.placeholder.com/70x70";
+                          }}
+                        />
+                        <AvatarFallback className="text-xs">
+                          {user.fullName?.charAt(0)?.toUpperCase()}{user.lastName?.charAt(0)?.toUpperCase() || ''}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="hidden sm:inline text-white text-sm font-medium truncate max-w-[100px]">
+                        {user.fullName}
+                      </span>
+                    </div>
+                  </Link>
+                  
+                  {/* Dropdown menu */}
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                    <Link href="/myprofile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                      My Profile
+                    </Link>
+                    <button 
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
               )}
 
               {/* Login/Register OR Logout */}

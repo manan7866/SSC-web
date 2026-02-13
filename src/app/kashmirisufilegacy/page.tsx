@@ -231,110 +231,102 @@ export default function Home() {
                   Discover. Search. Experience.
                   </h1> */}
 
-                  <div className="flex  flex-col px-8 py-12 rounded-xl bg-gray-50/100 backdrop-blur-xl  md:items-center md:justify-between md:gap-2 mb-8">
-                    <div className="flex w-full md:gap-2">
-                    <input
-                      type="text"
-                      placeholder="Search saints..."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      className="w-full md:w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none"
-                    />
-                    <div className="flex rounded-md w-max ">
-                    <button
-                      onClick={() => setSearch(query)}
-                      className="w-full md:w-auto px-4 py-2 bg-fixnix-lightpurple rounded-l-md text-white  hover:opacity-90 "
-                    >
-                      Search
-                    </button>
-                    {/* <select
-                      value={century}
-                      onChange={(e) => setCentury(e.target.value)}
-                      className="w-full md:w-1/4 px-4 py-2 border rounded-lg shadow-sm md:mx-2"
-                    >
-                      <option value="">Century</option>
-                      <option value="14th Century">14th Century</option>
-                      <option value="15th Century">15th Century</option>
-                      <option value="16th Century">16th Century</option>
-                      <option value="17th Century">17th Century</option>
-                      <option value="18th Century">18th Century</option>
-                      <option value="19th Century">19th Century</option>
-                      <option value="20th Century">20th Century</option>
-                      <option value="21st Century">21st Century</option>
-                    </select> */}
-                    <button
-                      onClick={() => {
-                        setSearch("");
-                        setQuery("");
-                        setCentury("");
-                        setPeriod("");
-                        setRegion("");
-                      }}
-                      className="w-full md:w-auto px-4 py-2  text-fixnix-lightpurple rounded-r-md hover:opacity-90 border-[1px] border-fixnix-lightpurple "
-                    >
-                      Reset
-                    </button>
+                  <div className="flex flex-col px-4 sm:px-8 py-6 rounded-xl bg-gray-50/100 backdrop-blur-xl mb-8">
+                    {/* Search Bar */}
+                    <div className="flex flex-col sm:flex-row gap-2 w-full mb-4">
+                      <input
+                        type="text"
+                        placeholder="Search saints..."
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
+                        className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-fixnix-lightpurple"
+                      />
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => setSearch(query)}
+                          className="w-full sm:w-auto px-4 py-2 bg-fixnix-lightpurple rounded-l-lg sm:rounded-l-md text-white hover:opacity-90 transition-colors"
+                        >
+                          Search
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSearch("");
+                            setQuery("");
+                            setCentury("");
+                            setPeriod("");
+                            setRegion("");
+                          }}
+                          className="w-full sm:w-auto px-4 py-2 text-fixnix-lightpurple rounded-r-lg sm:rounded-r-md hover:opacity-90 border-[1px] border-fixnix-lightpurple transition-colors"
+                        >
+                          Reset
+                        </button>
+                      </div>
                     </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 mt-2 grid-rows-1 w-full">
-                      <div className="text-xl  text-fixnix-lightpurple">
-                        <p className="mb-1">Period</p>
+                    
+                    {/* Filters */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 w-full">
+                      <div className="text-fixnix-lightpurple">
+                        <p className="mb-1 text-sm font-medium">Period</p>
                         <select
-                      value={period}
-                      onChange={(e) => setPeriod(e.target.value)}
-                      className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2"
-                    >
-                    <option value=""> All Period</option>
-                      <option value="Cross-Cultural Synthesis">Cross-Cultural Synthesis</option>
-                      <option value="Institutional Consolidation">Institutional Consolidation</option>
-                      <option value="Intellectual Refinement">Intellectual Refinement</option>
-                      <option value="Period of Reform and Integration">Period of Reform and Integration</option>
-                      <option value="Poetic Efflorescence">Poetic Efflorescence</option>
-                      <option value="The Formative Period">The Formative Period</option>
-
+                          value={period}
+                          onChange={(e) => setPeriod(e.target.value)}
+                          className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-fixnix-lightpurple"
+                        >
+                          <option value="">All Periods</option>
+                          <option value="Cross-Cultural Synthesis">Cross-Cultural Synthesis</option>
+                          <option value="Institutional Consolidation">Institutional Consolidation</option>
+                          <option value="Intellectual Refinement">Intellectual Refinement</option>
+                          <option value="Period of Reform and Integration">Period of Reform and Integration</option>
+                          <option value="Poetic Efflorescence">Poetic Efflorescence</option>
+                          <option value="The Formative Period">The Formative Period</option>
+                        </select>
+                      </div>
                       
-                    </select>
-
-                      </div>
-                      <div className="text-xl  text-fixnix-lightpurple">
-                        <p className="mb-1">Century</p>
+                      <div className="text-fixnix-lightpurple">
+                        <p className="mb-1 text-sm font-medium">Century</p>
                         <select
-                      value={century}
-                      onChange={(e) => setCentury(e.target.value)}
-                      className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2"
-                    >
-                      <option value="">All Century</option>
-                      <option value="14th Century">14th Century</option>
-                      <option value="15th Century">15th Century</option>
-                      <option value="16th Century">16th Century</option>
-                      <option value="17th Century">17th Century</option>
-                      <option value="18th Century">18th Century</option>
-                      <option value="19th Century">19th Century</option>
-                      <option value="20th Century">20th Century</option>
-                      <option value="21st Century">21st Century</option>
-                    </select>
+                          value={century}
+                          onChange={(e) => setCentury(e.target.value)}
+                          className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-fixnix-lightpurple"
+                        >
+                          <option value="">All Centuries</option>
+                          <option value="14th Century">14th Century</option>
+                          <option value="15th Century">15th Century</option>
+                          <option value="16th Century">16th Century</option>
+                          <option value="17th Century">17th Century</option>
+                          <option value="18th Century">18th Century</option>
+                          <option value="19th Century">19th Century</option>
+                          <option value="20th Century">20th Century</option>
+                          <option value="21st Century">21st Century</option>
+                        </select>
                       </div>
-                      <div className="text-xl text-fixnix-lightpurple">
-                        <p className="mb-1">Region</p>
-                        <select onChange={(e) => setRegion(e.target.value)} value={region} className="w-full  px-4 py-2 border rounded-lg shadow-sm md:mx-2">
-                      <option value="">All Region</option>
-                      <option value="south kashmir">South Kashmir</option>
-                      <option value="North Kashmir">North Kashmir</option>
-                      <option value="Central Kashmir">Central Kashmir</option>
+                      
+                      <div className="text-fixnix-lightpurple">
+                        <p className="mb-1 text-sm font-medium">Region</p>
+                        <select 
+                          onChange={(e) => setRegion(e.target.value)} 
+                          value={region} 
+                          className="w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-fixnix-lightpurple"
+                        >
+                          <option value="">All Regions</option>
+                          <option value="south kashmir">South Kashmir</option>
+                          <option value="North Kashmir">North Kashmir</option>
+                          <option value="Central Kashmir">Central Kashmir</option>
                         </select>
                       </div>
                     </div>
+                  </div>
                     
                   </div>
 
 
                   {/* Cards */}
-                  <div className="space-y-6">
+                  <div className="space-y-4">
                     {displayed.map((s) => (
-                      <div key={s.id} className=" rounded-xl bg-gray-50/100 backdrop-blur-xl shadow-md p-6">
-                        <h2 className="text-xl font-semibold">{s.name}</h2>
-                        <p className="text-sm text-gray-600 mb-2">{s.dates_raw ?? ""} | {s.period}</p>
-                        <p className="mb-4">{s.summary}</p>
+                      <div key={s.id} className="rounded-xl bg-gray-50/100 backdrop-blur-xl shadow-md p-4 sm:p-6">
+                        <h2 className="text-lg sm:text-xl font-semibold">{s.name}</h2>
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2">{s.dates_raw ?? ""} | {s.period}</p>
+                        <p className="mb-3 sm:mb-4 text-sm sm:text-base">{s.summary}</p>
                         <div className="flex flex-wrap gap-2">
                           {s.tags?.map((t, i) => (
                             <span key={i} className="bg-fixnix-lightpurple text-gray-100 text-xs font-medium px-2 py-1 rounded-full">{t}</span>
@@ -343,9 +335,8 @@ export default function Home() {
                       </div>
                     ))}
                     {displayed.length === 0 && (
-                      <p className="text-center text-gray-600">No results found.</p>
+                      <p className="text-center text-gray-600 py-8">No results found.</p>
                     )}
-                  </div>
                 </div>
               </div>
    <section className="relative block py-[120px] pb-[10px]">
