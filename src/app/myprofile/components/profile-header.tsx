@@ -35,7 +35,14 @@ export default function ProfileHeader() {
               <Skeleton className="h-24 w-24 rounded-full" />
             ) : (
               <Avatar className="h-24 w-24">
-                <AvatarImage src={undefined} alt="Profile" />
+                <AvatarImage 
+                  src={user?.avatar || undefined} 
+                  alt="Profile" 
+                  onError={(e) => {
+                    // Fallback to default avatar if image fails to load
+                    (e.target as HTMLImageElement).src = "https://via.placeholder.com/70x70";
+                  }}
+                />
                 <AvatarFallback className="text-2xl">
                   {user?.fullName?.slice(0, 2)}
                 </AvatarFallback>
@@ -71,7 +78,15 @@ export default function ProfileHeader() {
                 {loading ? (
                   <Skeleton className="h-4 w-24" />
                 ) : (
-                  "Joined March 2023"
+                  <p>
+  {user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    : "Joined March 2023"}
+</p>
                 )}
               </div>
             </div>

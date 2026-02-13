@@ -5,12 +5,36 @@ import "swiper/css/pagination";
 import Banner from "@/components/sections/home3/Banner";
 import Layout from "../../components/layout/Layout";
 import Image from "next/image";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { useState, useEffect } from "react";
 import {
   createBooking,
   getBookings,
 } from "@/hooks/bookServices";
+import { toast } from "sonner";
+import {
+  createMembership,
+  updateMembership,
+  deleteMembership,
+  ROLE_TYPES,
+  DONOR_TYPES,
+  VOLUNTEER_SUPPORT_TYPES,
+  VOLUNTEER_MODE_TYPES,
+  COLLABORATOR_INTENT_TYPES,
+} from "@/hooks/membershipServices";
+import { useAuth } from "@/context/AuthContext";
+interface VolunteerFormData {
+  phone: string;
+  location: string;
+  volunteerAreas?: string[];
+  volunteerExperience?: string;
+  volunteerTime?: string;
+  volunteerMode?: string;
+  additional?: string;
+  consent: boolean;
+  communication?: boolean;
+}
+
 const VolunteerSlides = [
   {
     subTitle: "Serve, Inspire, Grow, Connect, Transform",
@@ -52,12 +76,52 @@ const VolunteerSlides = [
 
 
 export default function Home() {
-  
-    const { register, handleSubmit, reset } = useForm();
-    const [loading, setLoading] = useState(false);
-    const [successMsg, setSuccessMsg] = useState("");
-    const [bookings, setBookings] = useState<any[]>([]);
-    const [refresh, setRefresh] = useState(false);
+  const authContext = useAuth();
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<VolunteerFormData>({
+    defaultValues: {
+      volunteerAreas: [],
+      consent: false,
+      communication: false,
+    },
+  });
+
+  const { register: registerBooking, handleSubmit: handleSubmitBooking, reset: resetBooking, formState: { errors: errorsBooking, isSubmitting: isSubmittingBooking } } = useForm();
+
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [refresh, setRefresh] = useState(false);
+
+  // Submit handler for volunteer form
+  const onSubmitVolunteer: SubmitHandler<VolunteerFormData> = async (data) => {
+    try {
+      const payload = {
+        phone: data.phone,
+        country: data.location,
+        agreedToPrinciples: data.consent,
+        consentedToUpdates: !!data.communication,
+        additionalInfo: data.additional,
+        volunteerSupport:
+          (data.volunteerAreas as (typeof VOLUNTEER_SUPPORT_TYPES)[number][]) ||
+          [],
+        role: ["volunteer"] as (typeof ROLE_TYPES)[number][],
+        previousVolunteerExp: data.volunteerExperience || "",
+        monthlyTime: data.volunteerTime || "",
+        volunteerMode: data.volunteerMode
+          ?.toUpperCase()
+          .replace("-", "_") as (typeof VOLUNTEER_MODE_TYPES)[number], // ✅ Convert to uppercase
+      };
+
+      const response = await createMembership(payload);
+      
+      toast.success("Volunteer application submitted successfully!");
+      reset(); // Reset form after successful submission
+    } catch (err) {
+      console.error(err);
+      toast.error("Error submitting volunteer application.");
+    }
+  };
   
     useEffect(() => {
       const fetchBookings = async () => {
@@ -70,8 +134,8 @@ export default function Home() {
       };
       fetchBookings();
     }, [refresh]);
-  
-    const onSubmit = async (data: any) => {
+
+    const onSubmitBooking = async (data: any) => {
       setLoading(true);
       try {
         await createBooking({
@@ -264,7 +328,7 @@ export default function Home() {
       </p>
     </div>
 
-    <form id="volunteerForm" className="space-y-6">
+    <form id="volunteer-application-form" onSubmit={handleSubmit(onSubmitVolunteer)} className="space-y-6">
       {/* Personal Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -272,10 +336,16 @@ export default function Home() {
             Phone *
           </label>
           <input
+            {...register("phone", { required: "Phone number is required" })}
             type="text"
             placeholder="Phone number"
             className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
           />
+          {errors.phone && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.phone.message}
+            </p>
+          )}
         </div>
 
         <div>
@@ -283,10 +353,16 @@ export default function Home() {
             Country *
           </label>
           <input
+            {...register("location", { required: "Country is required" })}
             type="text"
             placeholder="Country"
             className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
           />
+          {errors.location && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.location.message}
+            </p>
+          )}
         </div>
       </div>
 
@@ -303,7 +379,12 @@ export default function Home() {
             "craftsmanship",
           ].map((item) => (
             <label key={item} className="flex items-center space-x-2">
-              <input type="checkbox" value={item} className="w-4 h-4" />
+              <input
+                type="checkbox"
+                value={item}
+                {...register("volunteerAreas")}
+                className="w-4 h-4"
+              />
               <span className="capitalize">
                 {item.replace(/([A-Z])/g, " $1")}
               </span>
@@ -311,11 +392,13 @@ export default function Home() {
           ))}
         </div>
         <input
+          {...register("volunteerExperience")}
           type="text"
           placeholder="Previous volunteering experience"
           className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
         />
         <input
+          {...register("volunteerTime")}
           type="text"
           placeholder="Time you can offer monthly"
           className="w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
@@ -324,7 +407,12 @@ export default function Home() {
         <div className="flex gap-4">
           {["IN_PERSON", "REMOTE", "HYBRID"].map((mode) => (
             <label key={mode} className="flex items-center space-x-2">
-              <input type="radio" value={mode} className="w-4 h-4" />
+              <input
+                type="radio"
+                value={mode.toLowerCase()}
+                {...register("volunteerMode")}
+                className="w-4 h-4"
+              />
               <span className="capitalize">{mode.replace("_", "-")}</span>
             </label>
           ))}
@@ -337,6 +425,7 @@ export default function Home() {
           Anything else you'd like to share?
         </label>
         <textarea
+          {...register("additional")}
           className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
           rows={4}
         ></textarea>
@@ -345,22 +434,38 @@ export default function Home() {
       {/* Consent */}
       <div className="space-y-2">
         <label className="flex items-center space-x-2 text-gray-700">
-          <input type="checkbox" className="w-4 h-4" required />
+          <input
+            type="checkbox"
+            {...register("consent", {
+              required: "You must agree to continue",
+            })}
+            className="w-4 h-4"
+          />
           <span>I agree to the principles of the Sufi Science Center</span>
         </label>
         <label className="flex items-center space-x-2 text-gray-700">
-          <input type="checkbox" className="w-4 h-4" />
+          <input
+            type="checkbox"
+            {...register("communication")}
+            className="w-4 h-4"
+          />
           <span>I consent to receiving updates</span>
         </label>
+        {errors.consent && (
+          <p className="text-red-500 text-sm mt-1">
+            {errors.consent.message}
+          </p>
+        )}
       </div>
 
       {/* Buttons */}
       <div className="pt-4 space-y-3">
         <button
           type="submit"
+          disabled={isSubmitting}
           className="w-full py-3 bg-fixnix-lightpurple hover:bg-fixnix-darkpurple text-white font-semibold rounded-xl transition"
         >
-          Apply as Volunteer
+          {isSubmitting ? "Submitting..." : "Apply as Volunteer"}
         </button>
       </div>
     </form>
@@ -460,22 +565,22 @@ export default function Home() {
       {/* Left Side - Contact Form */}
       <div className="w-full lg:w-1/2">
         <div className="bg-fixnix-primary p-6 sm:p-8 lg:p-10 rounded-lg">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form id="booking-form" onSubmit={handleSubmitBooking(onSubmitBooking)}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
               <input
                 type="text"
                 placeholder="Subject"
-                {...register("subject", { required: true })}
+                {...registerBooking("subject", { required: true })}
                 className="w-full h-14 bg-white border rounded-md px-5 text-gray-700"
               />
               <input
                 type="date"
-                {...register("date", { required: true })}
+                {...registerBooking("date", { required: true })}
                 className="w-full h-14 bg-white border rounded-md px-5 text-gray-700"
               />
               <div className="col-span-2">
                 <select
-                  {...register("service", { required: true })}
+                  {...registerBooking("service", { required: true })}
                   className="w-full h-14 bg-white border rounded-md px-5 text-gray-700"
                 >
                   <option value="">Select Service</option>
@@ -502,16 +607,16 @@ export default function Home() {
             </div>
             <div className="mt-5">
               <textarea
-                {...register("comment")}
+                {...registerBooking("comment")}
                 placeholder="Comment"
                 className="w-full h-32 bg-white border rounded-md p-5 text-gray-700"
               ></textarea>
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isSubmittingBooking || loading}
                 className="inline-block bg-fixnix-lightpurple px-8 py-3 my-4 rounded-lg text-white hover:bg-fixnix-darkpurple transition duration-300"
               >
-                {loading ? "Sending..." : "Send Booking"}
+                {isSubmittingBooking ? "Sending..." : "Send Booking"}
               </button>
               {successMsg && <p className="text-green-500 mt-2">{successMsg}</p>}
             </div>

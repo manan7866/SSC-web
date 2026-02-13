@@ -8,6 +8,26 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Button } from "@/components/ui/button";
+import { useForm, SubmitHandler } from "react-hook-form";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  createMembership,
+  ROLE_TYPES,
+  DONOR_TYPES,
+} from "@/hooks/membershipServices";
+import { useAuth } from "@/context/AuthContext";
+interface DonorFormData {
+  phone: string;
+  location: string;
+  donorType?: string[];
+  anonymous?: boolean;
+  donorUpdates?: boolean;
+  additional?: string;
+  consent: boolean;
+  communication?: boolean;
+}
+
 const WaysSlides = [
   {
     subTitle: "Give with Purpose, Transform Lives",
@@ -47,6 +67,49 @@ const WaysSlides = [
 ];
 
 export default function Home() {
+  const authContext = useAuth();
+
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<DonorFormData>({
+    defaultValues: {
+      donorType: [],
+      anonymous: false,
+      donorUpdates: false,
+      consent: false,
+      communication: false,
+    },
+  });
+
+  // Submit handler for donor form
+  const onSubmit: SubmitHandler<DonorFormData> = async (data) => {
+    try {
+      const payload = {
+        phone: data.phone,
+        country: data.location,
+        agreedToPrinciples: data.consent,
+        consentedToUpdates: !!data.communication,
+        additionalInfo: data.additional,
+        donorType: (data.donorType as (typeof DONOR_TYPES)[number][]) || [],
+        role: ["donor"] as (typeof ROLE_TYPES)[number][],
+      };
+
+      // Add special donor types if checked
+      if (data.anonymous) {
+        payload.donorType?.push("remainAnonymous" as const);
+      }
+      if (data.donorUpdates) {
+        payload.donorType?.push("receiveUpdates" as const);
+      }
+
+      const response = await createMembership(payload);
+      
+      toast.success("Donor application submitted successfully!");
+      reset(); // Reset form after successful submission
+    } catch (err) {
+      console.error(err);
+      toast.error("Error submitting donor application.");
+    }
+  };
+
   return (
     <Layout headerStyle={2} footerStyle={1}>
       <Banner slides={WaysSlides} />
@@ -545,7 +608,7 @@ export default function Home() {
             </p>
           </div>
 
-          <form id="donorForm" className="space-y-6">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
@@ -553,10 +616,16 @@ export default function Home() {
                   Phone *
                 </label>
                 <input
+                  {...register("phone", { required: "Phone number is required" })}
                   type="text"
                   placeholder="Phone number"
                   className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
                 />
+                {errors.phone && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -564,10 +633,16 @@ export default function Home() {
                   Country *
                 </label>
                 <input
+                  {...register("location", { required: "Country is required" })}
                   type="text"
                   placeholder="Country"
                   className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
                 />
+                {errors.location && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.location.message}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -576,16 +651,29 @@ export default function Home() {
               <h3 className="text-lg font-semibold">Donor Preferences</h3>
               {["onetime", "monthly", "sponsor", "tools"].map((type) => (
                 <label key={type} className="flex items-center space-x-2">
-                  <input type="checkbox" value={type} className="w-4 h-4" />
+                  <input
+                    type="checkbox"
+                    value={type}
+                    {...register("donorType")}
+                    className="w-4 h-4"
+                  />
                   <span className="capitalize">{type}</span>
                 </label>
               ))}
               <label className="flex items-center space-x-2">
-                <input type="checkbox" className="w-4 h-4" />
+                <input
+                  type="checkbox"
+                  {...register("anonymous")}
+                  className="w-4 h-4"
+                />
                 <span>Remain Anonymous</span>
               </label>
               <label className="flex items-center space-x-2">
-                <input type="checkbox" className="w-4 h-4" />
+                <input
+                  type="checkbox"
+                  {...register("donorUpdates")}
+                  className="w-4 h-4"
+                />
                 <span>Receive donation updates</span>
               </label>
             </div>
@@ -596,6 +684,7 @@ export default function Home() {
                 Anything else you'd like to share?
               </label>
               <textarea
+                {...register("additional")}
                 className="mt-1 w-full border border-gray-300 rounded-xl px-4 py-2 focus:ring-2 focus:ring-indigo-400"
                 rows={4}
               ></textarea>
@@ -604,22 +693,39 @@ export default function Home() {
             {/* Consent */}
             <div className="space-y-2">
               <label className="flex items-center space-x-2 text-gray-700">
-                <input type="checkbox" className="w-4 h-4" required />
+                <input
+                  type="checkbox"
+                  {...register("consent", {
+                    required: "You must agree to continue",
+                  })}
+                  className="w-4 h-4"
+                  required
+                />
                 <span>I agree to the principles of the Sufi Science Center</span>
               </label>
               <label className="flex items-center space-x-2 text-gray-700">
-                <input type="checkbox" className="w-4 h-4" />
+                <input
+                  type="checkbox"
+                  {...register("communication")}
+                  className="w-4 h-4"
+                />
                 <span>I consent to receiving updates</span>
               </label>
+              {errors.consent && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.consent.message}
+                </p>
+              )}
             </div>
 
             {/* Buttons */}
             <div className="pt-4 space-y-3">
               <button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full py-3 bg-fixnix-lightpurple hover:bg-fixnix-darkpurple text-white font-semibold rounded-xl transition"
               >
-                Apply as Donor
+                {isSubmitting ? "Submitting..." : "Apply as Donor"}
               </button>
             </div>
           </form>
