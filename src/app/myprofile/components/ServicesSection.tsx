@@ -16,7 +16,7 @@ const formatDate = (dateString: string) => {
 
 const getStatusBadgeVariant = (status: number) => {
   switch(status) {
-    case 1: return "success"; // completed
+    case 1: return "default"; // completed
     case 2: return "destructive"; // cancelled
     default: return "secondary"; // pending
   }
@@ -496,7 +496,7 @@ export default function ServicesSection() {
                           <h4 className="font-medium">{item.title}</h4>
                           <p className="text-sm text-muted-foreground">{item.section.replace(/_/g, ' ')}</p>
                         </div>
-                        <Badge variant={item.status === "COMPLETED" ? "success" : item.status === "SKIPPED" ? "secondary" : "destructive"}>
+                        <Badge variant={item.status === "COMPLETED" ? "default" : item.status === "SKIPPED" ? "secondary" : "destructive"}>
                           {item.status.replace(/_/g, ' ')}
                         </Badge>
                       </div>
