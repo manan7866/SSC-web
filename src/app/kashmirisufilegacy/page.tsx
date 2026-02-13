@@ -321,23 +321,35 @@ export default function Home() {
 
 
                   {/* Cards */}
-                  <div className="space-y-4">
-                    {displayed.map((s) => (
-                      <div key={s.id} className="rounded-xl bg-gray-50/100 backdrop-blur-xl shadow-md p-4 sm:p-6">
-                        <h2 className="text-lg sm:text-xl font-semibold">{s.name}</h2>
-                        <p className="text-xs sm:text-sm text-gray-600 mb-2">{s.dates_raw ?? ""} | {s.period}</p>
-                        <p className="mb-3 sm:mb-4 text-sm sm:text-base">{s.summary}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {s.tags?.map((t, i) => (
-                            <span key={i} className="bg-fixnix-lightpurple text-gray-100 text-xs font-medium px-2 py-1 rounded-full">{t}</span>
-                          ))}
+                  <div className="max-w-5xl mx-auto">
+                    <div className="grid grid-cols-1 gap-4">
+                      {displayed.map((s) => (
+                        <div key={s.id} className="rounded-xl bg-gray-50/100 backdrop-blur-xl shadow-md p-4 sm:p-6">
+                          <h2 className="text-lg sm:text-xl font-semibold">{s.name}</h2>
+                          <div className="flex flex-wrap gap-2 text-xs sm:text-sm text-gray-600 mb-2">
+                            <span>{s.dates_raw ?? ""}</span>
+                            {s.period && <span>|</span>}
+                            <span>{s.period}</span>
+                            {s.region && (
+                              <>
+                                <span>|</span>
+                                <span className="capitalize">{s.region}</span>
+                              </>
+                            )}
+                          </div>
+                          <p className="mb-3 sm:mb-4 text-sm sm:text-base">{s.summary}</p>
+                          <div className="flex flex-wrap gap-2">
+                            {s.tags?.map((t, i) => (
+                              <span key={i} className="bg-fixnix-lightpurple text-gray-100 text-xs font-medium px-2 py-1 rounded-full">{t}</span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    {displayed.length === 0 && (
-                      <p className="text-center text-gray-600 py-8">No results found.</p>
-                    )}
-                </div>
+                      ))}
+                      {displayed.length === 0 && (
+                        <p className="text-center text-gray-600 py-8">No results found.</p>
+                      )}
+                    </div>
+                  </div>
               </div>
    <section className="relative block py-[120px] pb-[10px]">
           <div className="container mx-auto px-4">
