@@ -38,10 +38,10 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL:
       process.env.NEXT_PUBLIC_API_URL ||
-      "http://localhost:8001/v1",
+      "https://api.sufisciencecenter.info/v1",
     NEXT_PUBLIC_BACKEND_URL:
       process.env.NEXT_PUBLIC_BACKEND_URL ||
-      "http://localhost:8001/v1", //https://api.sufisciencecenter.info/v1
+      "https://api.sufisciencecenter.info/v1", //https://api.sufisciencecenter.info/v1
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
       process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "",
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY || "",
